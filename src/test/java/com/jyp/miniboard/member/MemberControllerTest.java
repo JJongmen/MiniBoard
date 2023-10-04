@@ -64,7 +64,8 @@ public class MemberControllerTest {
         return Stream.of(
                 Arguments.of(null, "name@email.com", "password"),
                 Arguments.of("name", null, "password"),
-                Arguments.of("name", null, "password")
+                Arguments.of("name", null, "password"),
+                Arguments.of("name", "invalid_email_type", "password")
         );
     }
 
