@@ -7,5 +7,6 @@ public record MemberSaveRequest(
         String name,
         @NotNull
         String email,
+        @NotNull
         String password) {
 }
