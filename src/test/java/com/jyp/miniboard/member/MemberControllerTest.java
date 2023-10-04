@@ -1,5 +1,6 @@
 package com.jyp.miniboard.member;
 
+import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,9 +20,12 @@ public class MemberControllerTest {
     @Mock
     private MemberService memberService;
     private MockMvc mockMvc;
+    private Gson gson;
+
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(memberController).build();
+        gson = new Gson();
     }
 
     @Test
