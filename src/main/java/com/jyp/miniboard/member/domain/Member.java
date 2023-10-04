@@ -1,4 +1,4 @@
-package com.jyp.miniboard.member;
+package com.jyp.miniboard.member.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -40,27 +40,27 @@ public class Member {
         private String email;
         private String password;
 
-        Builder id(final Long id) {
+        public Builder id(final Long id) {
             this.id = id;
             return this;
         }
 
-        Builder name(final String name) {
+        public Builder name(final String name) {
             this.name = name;
             return this;
         }
 
-        Builder email(final String email) {
+        public Builder email(final String email) {
             this.email = email;
             return this;
         }
 
-        Builder password(final String password) {
+        public Builder password(final String password) {
             this.password = password;
             return this;
         }
 
-        Member build() {
+        public Member build() {
             final Member member = new Member();
             member.id = this.id;
             member.name = this.name;

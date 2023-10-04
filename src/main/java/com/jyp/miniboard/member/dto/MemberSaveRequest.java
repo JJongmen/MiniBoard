@@ -1,4 +1,4 @@
-package com.jyp.miniboard.member;
+package com.jyp.miniboard.member.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;

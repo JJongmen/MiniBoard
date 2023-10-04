@@ -1,5 +1,10 @@
-package com.jyp.miniboard.member;
+package com.jyp.miniboard.member.service;
 
+import com.jyp.miniboard.member.domain.Member;
+import com.jyp.miniboard.member.dto.MemberSaveResponse;
+import com.jyp.miniboard.member.exception.MemberErrorResult;
+import com.jyp.miniboard.member.exception.MemberException;
+import com.jyp.miniboard.member.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

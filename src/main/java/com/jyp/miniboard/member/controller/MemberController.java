@@ -1,5 +1,8 @@
-package com.jyp.miniboard.member;
+package com.jyp.miniboard.member.controller;
 
+import com.jyp.miniboard.member.dto.MemberSaveRequest;
+import com.jyp.miniboard.member.dto.MemberSaveResponse;
+import com.jyp.miniboard.member.service.MemberService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

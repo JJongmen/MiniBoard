@@ -1,4 +1,4 @@
-package com.jyp.miniboard.member;
+package com.jyp.miniboard.member.dto;
 
 public record MemberSaveResponse(
         Long id

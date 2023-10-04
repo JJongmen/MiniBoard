@@ -1,6 +1,9 @@
-package com.jyp.miniboard.member;
+package com.jyp.miniboard.member.controller;
 
 import com.google.gson.Gson;
+import com.jyp.miniboard.member.dto.MemberSaveRequest;
+import com.jyp.miniboard.member.dto.MemberSaveResponse;
+import com.jyp.miniboard.member.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
