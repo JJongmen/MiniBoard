@@ -12,6 +12,9 @@ public class MemberRepositoryTest {
 
     @Autowired
     private MemberRepository memberRepository;
+    private final String name = "name";
+    private final String email = "email";
+    private final String password = "password";
 
     @Test
     void MemberRepository가Null이아님() {
@@ -22,9 +25,9 @@ public class MemberRepositoryTest {
     void 멤버등록() {
         // given
         final Member member = Member.builder()
-                .name("name")
-                .email("email")
-                .password("password")
+                .name(name)
+                .email(email)
+                .password(password)
                 .build();
 
         // when
@@ -32,8 +35,21 @@ public class MemberRepositoryTest {
 
         // then
         assertThat(result.getId()).isNotNull();
-        assertThat(result.getName()).isEqualTo("name");
-        assertThat(result.getEmail()).isEqualTo("email");
-        assertThat(result.getPassword()).isEqualTo("password");
+        assertThat(result.getName()).isEqualTo(name);
+        assertThat(result.getEmail()).isEqualTo(email);
+        assertThat(result.getPassword()).isEqualTo(password);
+    }
+
+    @Test
+    void 멤버존재여부() {
+        // given
+        final Member member = Member.builder().email(email).build();
+        memberRepository.save(member);
+
+        // when
+        boolean isExist = memberRepository.existsByEmail(email);
+
+        // then
+        assertThat(isExist).isTrue();
     }
 }
