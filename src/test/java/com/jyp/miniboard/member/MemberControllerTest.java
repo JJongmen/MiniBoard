@@ -54,6 +54,22 @@ public class MemberControllerTest {
         resultActions.andExpect(status().isBadRequest());
     }
 
+    @Test
+    void 회원가입실패_이메일이null임() throws Exception {
+        // given
+        final String url = "/api/v1/members";
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(url)
+                        .content(gson.toJson(memberSaveRequest("name", null, "password")))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
+    }
+
     private static MemberSaveRequest memberSaveRequest(final String name, final String email, final String password) {
         return new MemberSaveRequest(name, email, password);
     }
