@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,6 +68,24 @@ public class MemberControllerTest {
                 Arguments.of("name", null, "password"),
                 Arguments.of("name", "invalid_email_type", "password")
         );
+    }
+
+    @Test
+    void 회원가입성공() throws Exception {
+        // given
+        final String url = "/api/v1/members";
+        final MemberSaveResponse memberSaveResponse = new MemberSaveResponse(-1L);
+        doReturn(memberSaveResponse).when(memberService).join("name", "name@email.com", "password");
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(url)
+                        .content(gson.toJson(memberSaveRequest("name", "name@email.com", "password")))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isCreated());
     }
 
     private static MemberSaveRequest memberSaveRequest(final String name, final String email, final String password) {

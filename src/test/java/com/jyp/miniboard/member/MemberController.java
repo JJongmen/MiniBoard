@@ -1,6 +1,7 @@
 package com.jyp.miniboard.member;
 
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +17,8 @@ public class MemberController {
     }
 
     @PostMapping("/api/v1/members")
-    public ResponseEntity<Void> join(@RequestBody @Valid final MemberSaveRequest memberSaveRequest) {
-        return null;
+    public ResponseEntity<MemberSaveResponse> join(@RequestBody @Valid final MemberSaveRequest memberSaveRequest) {
+        final MemberSaveResponse memberSaveResponse = memberService.join(memberSaveRequest.name(), memberSaveRequest.email(), memberSaveRequest.password());
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberSaveResponse);
     }
 }

@@ -23,11 +23,6 @@ public class MemberService {
                 .build();
         final Member savedMember = memberRepository.save(member);
 
-        return new MemberSaveResponse(
-                savedMember.getId(),
-                savedMember.getName(),
-                savedMember.getEmail(),
-                savedMember.getPassword()
-        );
+        return new MemberSaveResponse(savedMember.getId());
     }
 }
