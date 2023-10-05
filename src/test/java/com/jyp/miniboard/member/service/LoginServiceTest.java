@@ -50,7 +50,19 @@ public class LoginServiceTest {
         assertThat(result.getErrorResult()).isEqualTo(MemberErrorResult.NO_PWD_CORRECT);
     }
 
+    @Test
+    void 로그인성공() {
+        // given
+        doReturn(Optional.of(member())).when(memberRepository).findByEmail(email);
+
+        // when
+        Long memberId = loginService.login(email, password);
+
+        // then
+        assertThat(memberId).isEqualTo(-1L);
+    }
+
     private Member member() {
-        return Member.builder().email(email).password(password).build();
+        return Member.builder().id(-1L).email(email).password(password).build();
     }
 }

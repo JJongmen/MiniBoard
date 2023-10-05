@@ -11,11 +11,13 @@ public class SessionLoginService implements LoginService {
     private final MemberRepository memberRepository;
 
     @Override
-    public void login(final String email, final String password) {
+    public Long login(final String email, final String password) {
         final Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberException(MemberErrorResult.NO_MEMBER_EMAIL));
         if (!password.equals(findMember.getPassword())) {
             throw new MemberException(MemberErrorResult.NO_PWD_CORRECT);
         }
+
+        return findMember.getId();
     }
 }
