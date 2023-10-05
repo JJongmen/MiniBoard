@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest // JPA 관련된 설정만 로드
@@ -51,5 +53,19 @@ public class MemberRepositoryTest {
 
         // then
         assertThat(isExist).isTrue();
+    }
+
+    @Test
+    void 이메일가진멤버조회() {
+        // given
+        final Member member = Member.builder().email(email).build();
+        memberRepository.save(member);
+
+        // when
+        final Optional<Member> optionalMember = memberRepository.findByEmail(email);
+
+        // then
+        assertThat(optionalMember.isPresent()).isTrue();
+        assertThat(optionalMember.get().getEmail()).isEqualTo(email);
     }
 }
