@@ -7,8 +7,12 @@ import com.jyp.miniboard.member.exception.MemberException;
 import com.jyp.miniboard.member.repository.MemberRepository;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
+import java.security.Key;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Optional;
@@ -17,9 +21,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TokenService {
 
+    @Value("${jwt.secretKey}")
+    private String SECRET_KEY;
     private final MemberRepository memberRepository;
 
     public String createToken(TokenCreateRequest tokenCreateRequest) {
+        final byte[] secretKeyBytes = DatatypeConverter.parseBase64Binary(SECRET_KEY);
+        final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+        final Key signingKey = new SecretKeySpec(secretKeyBytes, signatureAlgorithm.getJcaName());
+
         Date now = new Date();
         JwtBuilder jwt = Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
@@ -27,7 +37,7 @@ public class TokenService {
                 .claim("id", tokenCreateRequest.id())
                 .claim("name", tokenCreateRequest.name())
                 .claim("email", tokenCreateRequest.email())
-                .signWith(SignatureAlgorithm.HS256, "secret")
+                .signWith(signingKey, signatureAlgorithm)
                 .setExpiration(new Date(now.getTime() + Duration.ofHours(1).toMillis()));
         return jwt.compact();
     }
@@ -39,8 +49,9 @@ public class TokenService {
         String token = authorizationHeader.substring("Bearer ".length());
 
         try {
-            return Jwts.parser()
-                    .setSigningKey("secret")
+            return Jwts.parserBuilder()
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(SECRET_KEY))
+                    .build()
                     .parseClaimsJws(token)
                     .getBody();
         } catch (JwtException e) {

@@ -1,21 +1,21 @@
 package com.jyp.miniboard.member.service;
 
-import com.jyp.miniboard.member.domain.Member;
 import com.jyp.miniboard.member.dto.TokenCreateRequest;
 import com.jyp.miniboard.member.exception.MemberErrorResult;
 import com.jyp.miniboard.member.exception.MemberException;
 import com.jyp.miniboard.member.repository.MemberRepository;
-import io.jsonwebtoken.impl.DefaultJwtBuilder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
@@ -26,6 +26,12 @@ class TokenServiceTest {
     private TokenService tokenService;
     @Mock
     private MemberRepository memberRepository;
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(tokenService, "SECRET_KEY",
+                "thisissecretkeythisissecretkeythisissecretkeythisissecretkeythisissecretkey");
+    }
 
     @Test
     void tokenService가Null이아님() {
