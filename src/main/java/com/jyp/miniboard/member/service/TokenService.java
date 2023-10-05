@@ -34,7 +34,7 @@ public class TokenService {
         JwtBuilder jwt = Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .setIssuedAt(now)
-                .claim("id", tokenCreateRequest.id())
+                .setSubject(tokenCreateRequest.id().toString())
                 .claim("name", tokenCreateRequest.name())
                 .claim("email", tokenCreateRequest.email())
                 .signWith(signingKey, signatureAlgorithm)
@@ -61,12 +61,12 @@ public class TokenService {
 
     public Long getMemberId(String authorizationHeader) {
         final Claims token = parseToken(authorizationHeader);
-        return Long.valueOf(token.get("id").toString());
+        return Long.parseLong(token.getSubject());
     }
 
     public Member getMember(String authorizationHeader) {
         final Claims token = parseToken(authorizationHeader);
-        final Long id = Long.valueOf(token.get("id").toString());
+        final long id = Long.parseLong(token.getSubject());
         final Optional<Member> optionalMember = memberRepository.findById(id);
         return optionalMember.orElseThrow(() ->
                 new MemberException(MemberErrorResult.NO_MEMBER_ID));
