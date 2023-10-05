@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,5 +70,24 @@ public class MemberLoginControllerTest {
                 Arguments.of("name@email.com", null),
                 Arguments.of("wrong email", "password")
         );
+    }
+
+    @Test
+    void 로그인성공() throws Exception {
+        // given
+        final String url = "/api/v1/members/login";
+        doReturn(-1L).when(sessionLoginService).login("name@email.com", "password");
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(url)
+                        .content(gson.toJson(new MemberLoginRequest("name@email.com", "password")))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk());
+        final MockHttpSession session = (MockHttpSession) resultActions.andReturn().getRequest().getSession();
+        assertThat(session.getAttribute("memberId")).isEqualTo(-1L);
     }
 }

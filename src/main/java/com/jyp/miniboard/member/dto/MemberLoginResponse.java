@@ -1,4 +1,6 @@
 package com.jyp.miniboard.member.dto;
 
-public record MemberLoginResponse() {
+public record MemberLoginResponse(
+        Long memberId
+) {
 }
