@@ -21,7 +21,7 @@ import static org.mockito.Mockito.doReturn;
 public class LoginServiceTest {
 
     @InjectMocks
-    private SessionLoginService loginService;
+    private LoginService loginService;
     @Mock
     private MemberRepository memberRepository;
     private final String email = "name@email.com";

@@ -3,8 +3,9 @@ package com.jyp.miniboard.member.controller;
 import com.google.gson.Gson;
 import com.jyp.miniboard.member.dto.MemberLoginRequest;
 import com.jyp.miniboard.member.dto.MemberLoginResponse;
-import com.jyp.miniboard.member.service.SessionLoginService;
+import com.jyp.miniboard.member.service.LoginService;
 import com.jyp.miniboard.member.service.TokenService;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,6 +27,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,7 +37,7 @@ public class MemberLoginControllerTest {
     @InjectMocks
     private MemberLoginController memberLoginController;
     @Mock
-    private SessionLoginService sessionLoginService;
+    private LoginService loginService;
     @Mock
     private TokenService tokenService;
     private MockMvc mockMvc;
@@ -77,33 +80,14 @@ public class MemberLoginControllerTest {
         );
     }
 
-    @Disabled
-    @Test
-    void 세션_로그인성공() throws Exception {
-        // given
-        final String url = "/api/v1/members/login";
-        doReturn(-1L).when(sessionLoginService).login("name@email.com", "password");
-
-        // when
-        final ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(url)
-                        .content(gson.toJson(new MemberLoginRequest("name@email.com", "password")))
-                        .contentType(MediaType.APPLICATION_JSON)
-        );
-
-        // then
-        resultActions.andExpect(status().isOk());
-        final MockHttpSession session = (MockHttpSession) resultActions.andReturn().getRequest().getSession();
-        assertThat(session.getAttribute("memberId")).isEqualTo(-1L);
-    }
-
     @Test
     void 로그인성공() throws Exception {
         // given
         final String url = "/api/v1/members/login";
         doReturn(new MemberLoginResponse(-1L, "name", "name@email.com"))
-                .when(sessionLoginService)
+                .when(loginService)
                 .login("name@email.com", "password");
+        doReturn("token").when(tokenService).createToken(any());
 
         // when
         final ResultActions resultActions = mockMvc.perform(
