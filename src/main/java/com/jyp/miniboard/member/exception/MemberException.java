@@ -1,14 +1,11 @@
 package com.jyp.miniboard.member.exception;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Getter
 public class MemberException extends RuntimeException{
 
     private final MemberErrorResult errorResult;
-
-    public MemberException(final MemberErrorResult errorResult) {
-        this.errorResult = errorResult;
-    }
-
-    public MemberErrorResult getErrorResult() {
-        return errorResult;
-    }
 }
