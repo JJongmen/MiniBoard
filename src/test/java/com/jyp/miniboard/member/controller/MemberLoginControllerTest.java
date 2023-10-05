@@ -2,8 +2,11 @@ package com.jyp.miniboard.member.controller;
 
 import com.google.gson.Gson;
 import com.jyp.miniboard.member.dto.MemberLoginRequest;
+import com.jyp.miniboard.member.dto.MemberLoginResponse;
 import com.jyp.miniboard.member.service.SessionLoginService;
+import com.jyp.miniboard.member.service.TokenService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,6 +35,8 @@ public class MemberLoginControllerTest {
     private MemberLoginController memberLoginController;
     @Mock
     private SessionLoginService sessionLoginService;
+    @Mock
+    private TokenService tokenService;
     private MockMvc mockMvc;
     private Gson gson;
 
@@ -72,8 +77,9 @@ public class MemberLoginControllerTest {
         );
     }
 
+    @Disabled
     @Test
-    void 로그인성공() throws Exception {
+    void 세션_로그인성공() throws Exception {
         // given
         final String url = "/api/v1/members/login";
         doReturn(-1L).when(sessionLoginService).login("name@email.com", "password");
@@ -89,5 +95,24 @@ public class MemberLoginControllerTest {
         resultActions.andExpect(status().isOk());
         final MockHttpSession session = (MockHttpSession) resultActions.andReturn().getRequest().getSession();
         assertThat(session.getAttribute("memberId")).isEqualTo(-1L);
+    }
+
+    @Test
+    void 로그인성공() throws Exception {
+        // given
+        final String url = "/api/v1/members/login";
+        doReturn(new MemberLoginResponse(-1L, "name", "name@email.com"))
+                .when(sessionLoginService)
+                .login("name@email.com", "password");
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(url)
+                        .content(gson.toJson(new MemberLoginRequest("name@email.com", "password")))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk());
     }
 }

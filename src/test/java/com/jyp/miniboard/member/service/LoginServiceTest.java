@@ -1,6 +1,7 @@
 package com.jyp.miniboard.member.service;
 
 import com.jyp.miniboard.member.domain.Member;
+import com.jyp.miniboard.member.dto.MemberLoginResponse;
 import com.jyp.miniboard.member.exception.MemberErrorResult;
 import com.jyp.miniboard.member.exception.MemberException;
 import com.jyp.miniboard.member.repository.MemberRepository;
@@ -56,10 +57,11 @@ public class LoginServiceTest {
         doReturn(Optional.of(member())).when(memberRepository).findByEmail(email);
 
         // when
-        Long memberId = loginService.login(email, password);
+        MemberLoginResponse result = loginService.login(email, password);
 
         // then
-        assertThat(memberId).isEqualTo(-1L);
+        assertThat(result.id()).isEqualTo(-1L);
+        assertThat(result.email()).isEqualTo(email);
     }
 
     private Member member() {

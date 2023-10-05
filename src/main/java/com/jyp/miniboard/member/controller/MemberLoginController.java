@@ -2,9 +2,10 @@ package com.jyp.miniboard.member.controller;
 
 import com.jyp.miniboard.member.dto.MemberLoginRequest;
 import com.jyp.miniboard.member.dto.MemberLoginResponse;
+import com.jyp.miniboard.member.dto.TokenCreateRequest;
 import com.jyp.miniboard.member.service.LoginService;
+import com.jyp.miniboard.member.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,21 +18,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberLoginController {
 
     private final LoginService loginService;
+    private final TokenService tokenService;
 
     @PostMapping("/api/v1/members/login")
     public ResponseEntity<MemberLoginResponse> login(
-            @RequestBody @Valid final MemberLoginRequest memberLoginRequest,
-            HttpServletRequest request) {
-        final Long memberId = loginService.login(memberLoginRequest.email(), memberLoginRequest.password());
+            @RequestBody @Valid final MemberLoginRequest memberLoginRequest) {
+        final MemberLoginResponse memberLoginResponse = loginService.login(
+                memberLoginRequest.email(),
+                memberLoginRequest.password());
 
-        HttpSession session = request.getSession();
-        if (!session.isNew()) {
-            session.invalidate();
-            session = request.getSession();
-        }
-        session.setAttribute("memberId", memberId);
+        TokenCreateRequest tokenCreateRequest = new TokenCreateRequest(
+                memberLoginResponse.id(),
+                memberLoginResponse.name(),
+                memberLoginResponse.email());
+        tokenService.createToken(tokenCreateRequest);
 
-        final MemberLoginResponse memberLoginResponse = new MemberLoginResponse(memberId);
         return ResponseEntity.ok(memberLoginResponse);
     }
 }

@@ -1,5 +1,7 @@
 package com.jyp.miniboard.member.service;
 
+import com.jyp.miniboard.member.dto.MemberLoginResponse;
+
 public interface LoginService {
-    Long login(String email, String password);
+    MemberLoginResponse login(String email, String password);
 }

@@ -1,6 +1,7 @@
 package com.jyp.miniboard.member.service;
 
 import com.jyp.miniboard.member.domain.Member;
+import com.jyp.miniboard.member.dto.TokenCreateRequest;
 import com.jyp.miniboard.member.exception.MemberErrorResult;
 import com.jyp.miniboard.member.exception.MemberException;
 import com.jyp.miniboard.member.repository.MemberRepository;
@@ -34,14 +35,10 @@ class TokenServiceTest {
     @Test
     void 토큰생성() {
         // given
-        final Member member = Member.builder()
-                .id(-1L)
-                .name("name")
-                .email("name@email.com")
-                .build();
+        final TokenCreateRequest tokenCreateRequest = new TokenCreateRequest(-1L, "name", "email");
 
         // when
-        final String result = tokenService.createToken(member);
+        final String result = tokenService.createToken(tokenCreateRequest);
 
         // then
         assertThat(result).isNotNull();
@@ -50,12 +47,8 @@ class TokenServiceTest {
     @Test
     void 멤버ID조회() {
         // given
-        final Member member = Member.builder()
-                .id(-1L)
-                .name("name")
-                .email("email")
-                .build();
-        final String token = tokenService.createToken(member);
+        final TokenCreateRequest tokenCreateRequest = new TokenCreateRequest(-1L, "name", "email");
+        final String token = tokenService.createToken(tokenCreateRequest);
         final String authorizationHeader = "Bearer " + token;
 
         // when
@@ -68,12 +61,8 @@ class TokenServiceTest {
     @Test
     void 멤버조회실패_없는ID() {
         // given
-        final Member member = Member.builder()
-                .id(-1L)
-                .name("name")
-                .email("email")
-                .build();
-        final String token = tokenService.createToken(member);
+        final TokenCreateRequest tokenCreateRequest = new TokenCreateRequest(-1L, "name", "email");
+        final String token = tokenService.createToken(tokenCreateRequest);
         final String authorizationHeader = "Bearer " + token;
         doReturn(Optional.empty()).when(memberRepository).findById(any());
 

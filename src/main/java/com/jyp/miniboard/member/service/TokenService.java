@@ -1,6 +1,7 @@
 package com.jyp.miniboard.member.service;
 
 import com.jyp.miniboard.member.domain.Member;
+import com.jyp.miniboard.member.dto.TokenCreateRequest;
 import com.jyp.miniboard.member.exception.MemberErrorResult;
 import com.jyp.miniboard.member.exception.MemberException;
 import com.jyp.miniboard.member.repository.MemberRepository;
@@ -18,14 +19,14 @@ public class TokenService {
 
     private final MemberRepository memberRepository;
 
-    public String createToken(Member member) {
+    public String createToken(TokenCreateRequest tokenCreateRequest) {
         Date now = new Date();
         JwtBuilder jwt = Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .setIssuedAt(now)
-                .claim("id", member.getId())
-                .claim("name", member.getName())
-                .claim("email", member.getEmail())
+                .claim("id", tokenCreateRequest.id())
+                .claim("name", tokenCreateRequest.name())
+                .claim("email", tokenCreateRequest.email())
                 .signWith(SignatureAlgorithm.HS256, "secret")
                 .setExpiration(new Date(now.getTime() + Duration.ofHours(1).toMillis()));
         return jwt.compact();
