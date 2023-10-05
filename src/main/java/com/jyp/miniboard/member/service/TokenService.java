@@ -30,4 +30,33 @@ public class TokenService {
                 .setExpiration(new Date(now.getTime() + Duration.ofHours(1).toMillis()));
         return jwt.compact();
     }
+
+    private Claims parseToken(String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new MemberException(MemberErrorResult.NO_TOKEN);
+        }
+        String token = authorizationHeader.substring("Bearer ".length());
+
+        try {
+            return Jwts.parser()
+                    .setSigningKey("secret")
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (JwtException e) {
+            throw new JwtException("ExpiredToken");
+        }
+    }
+
+    public Long getMemberId(String authorizationHeader) {
+        final Claims token = parseToken(authorizationHeader);
+        return Long.valueOf(token.get("id").toString());
+    }
+
+    public Member getMember(String authorizationHeader) {
+        final Claims token = parseToken(authorizationHeader);
+        final Long id = Long.valueOf(token.get("id").toString());
+        final Optional<Member> optionalMember = memberRepository.findById(id);
+        return optionalMember.orElseThrow(() ->
+                new MemberException(MemberErrorResult.NO_MEMBER_ID));
+    }
 }
