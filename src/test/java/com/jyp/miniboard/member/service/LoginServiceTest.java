@@ -1,5 +1,6 @@
 package com.jyp.miniboard.member.service;
 
+import com.jyp.miniboard.member.domain.Member;
 import com.jyp.miniboard.member.exception.MemberErrorResult;
 import com.jyp.miniboard.member.exception.MemberException;
 import com.jyp.miniboard.member.repository.MemberRepository;
@@ -35,5 +36,21 @@ public class LoginServiceTest {
 
         // then
         assertThat(result.getErrorResult()).isEqualTo(MemberErrorResult.NO_MEMBER_EMAIL);
+    }
+
+    @Test
+    void 로그인실패_비밀번호틀림() {
+        // given
+        doReturn(Optional.of(member())).when(memberRepository).findByEmail(email);
+        
+        // when
+        final MemberException result = assertThrows(MemberException.class, () -> loginService.login(email, "wrong password"));
+
+        // then
+        assertThat(result.getErrorResult()).isEqualTo(MemberErrorResult.NO_PWD_CORRECT);
+    }
+
+    private Member member() {
+        return Member.builder().email(email).password(password).build();
     }
 }
