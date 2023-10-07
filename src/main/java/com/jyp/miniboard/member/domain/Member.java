@@ -1,6 +1,6 @@
 package com.jyp.miniboard.member.domain;
 
-import com.jyp.miniboard.member.dto.MemberSaveRequest;
+import com.jyp.miniboard.member.dto.SignUpRequest;
 import com.jyp.miniboard.member.dto.MemberUpdateRequest;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,7 +23,7 @@ public class Member {
     private String password;
     private MemberType type;
 
-    public static Member from(MemberSaveRequest request, PasswordEncoder encoder) {
+    public static Member from(SignUpRequest request, PasswordEncoder encoder) {
         return Member.builder()
                 .name(request.name())
                 .email(request.email())

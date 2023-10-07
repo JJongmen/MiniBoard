@@ -1,6 +1,6 @@
 package com.jyp.miniboard.member.dto;
 
-public record MemberSaveResponse(
+public record SignUpResponse(
         Long id
 ) {
 

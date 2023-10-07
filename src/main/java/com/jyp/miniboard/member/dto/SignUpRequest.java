@@ -3,7 +3,7 @@ package com.jyp.miniboard.member.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
-public record MemberSaveRequest(
+public record SignUpRequest(
         @NotNull
         String name,
         @NotNull @Email

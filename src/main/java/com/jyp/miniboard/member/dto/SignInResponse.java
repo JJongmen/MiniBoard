@@ -1,6 +1,6 @@
 package com.jyp.miniboard.member.dto;
 
-public record MemberLoginResponse(
+public record SignInResponse(
         Long id,
         String name,
         String email
