@@ -3,10 +3,7 @@ package com.jyp.miniboard.domain;
 import com.jyp.miniboard.common.MemberType;
 import com.jyp.miniboard.dto.sign_up.SignUpRequest;
 import com.jyp.miniboard.dto.member.MemberUpdateRequest;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -22,6 +19,7 @@ public class Member {
     private String name;
     private String email;
     private String password;
+    @Enumerated(EnumType.STRING)
     private MemberType type;
 
     public static Member from(SignUpRequest request, PasswordEncoder encoder) {
