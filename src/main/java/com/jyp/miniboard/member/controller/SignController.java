@@ -27,16 +27,7 @@ public class SignController {
     @PostMapping("/api/v1/sign-in")
     public ResponseEntity<SignInResponse> signIn(
             @RequestBody @Valid final SignInRequest signInRequest) {
-        final SignInResponse signInResponse = signService.signIn(
-                signInRequest.email(),
-                signInRequest.password());
-
-        TokenCreateRequest tokenCreateRequest = new TokenCreateRequest(
-                signInResponse.id(),
-                signInResponse.name(),
-                signInResponse.email());
-        tokenService.createToken(tokenCreateRequest);
-
+        final SignInResponse signInResponse = signService.signIn(signInRequest);
         return ResponseEntity.ok(signInResponse);
     }
 }

@@ -1,12 +1,14 @@
 package com.jyp.miniboard.member.service;
 
 import com.jyp.miniboard.member.domain.Member;
+import com.jyp.miniboard.member.dto.SignInRequest;
 import com.jyp.miniboard.member.dto.SignInResponse;
 import com.jyp.miniboard.member.dto.SignUpRequest;
 import com.jyp.miniboard.member.dto.SignUpResponse;
 import com.jyp.miniboard.member.exception.MemberErrorResult;
 import com.jyp.miniboard.member.exception.MemberException;
 import com.jyp.miniboard.member.repository.MemberRepository;
+import com.jyp.miniboard.security.TokenProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,6 +33,8 @@ public class SignServiceTest {
     private MemberRepository memberRepository;
     @Mock
     private PasswordEncoder encoder;
+    @Mock
+    private TokenProvider tokenProvider;
     private final Long id = -1L;
     private final String name = "name";
     private final String email = "name@email.com";
@@ -74,37 +78,46 @@ public class SignServiceTest {
     void 로그인실패_이메일없음() {
         // given
         doReturn(Optional.empty()).when(memberRepository).findByEmail(email);
+        final SignInRequest request = new SignInRequest(email, password);
 
         // when then
-        final MemberException result = assertThrows(MemberException.class, () -> signService.signIn(email, password));
+        final MemberException result = assertThrows(MemberException.class, () -> {
+            signService.signIn(request);
+        });
 
         // then
-        assertThat(result.getErrorResult()).isEqualTo(MemberErrorResult.NO_MEMBER_EMAIL);
+        assertThat(result.getErrorResult()).isEqualTo(MemberErrorResult.INVALID_ID_OR_PASSWORD);
     }
 
     @Test
     void 로그인실패_비밀번호틀림() {
         // given
         doReturn(Optional.of(member())).when(memberRepository).findByEmail(email);
-        
+        final SignInRequest request = new SignInRequest(email, "wrong password");
+
         // when
-        final MemberException result = assertThrows(MemberException.class, () -> signService.signIn(email, "wrong password"));
+        final MemberException result = assertThrows(MemberException.class, () -> {
+            signService.signIn(request);
+        });
 
         // then
-        assertThat(result.getErrorResult()).isEqualTo(MemberErrorResult.NO_PWD_CORRECT);
+        assertThat(result.getErrorResult()).isEqualTo(MemberErrorResult.INVALID_ID_OR_PASSWORD);
     }
 
     @Test
     void 로그인성공() {
         // given
         doReturn(Optional.of(member())).when(memberRepository).findByEmail(email);
+        doReturn(true).when(encoder).matches(anyString(), anyString());
+        doReturn("token").when(tokenProvider).createToken(anyString());
+        final SignInRequest request = new SignInRequest(email, password);
 
         // when
-        SignInResponse result = signService.signIn(email, password);
+        SignInResponse result = signService.signIn(request);
 
         // then
-        assertThat(result.id()).isEqualTo(-1L);
-        assertThat(result.email()).isEqualTo(email);
+        assertThat(result.name()).isEqualTo(name);
+        assertThat(result.token()).isNotNull();
     }
 
     private Member member() {

@@ -1,8 +1,10 @@
 package com.jyp.miniboard.member.dto;
 
+import com.jyp.miniboard.member.domain.MemberType;
+
 public record SignInResponse(
-        Long id,
         String name,
-        String email
+        MemberType type,
+        String token
 ) {
 }
