@@ -1,7 +1,8 @@
-package com.jyp.miniboard.member.domain;
+package com.jyp.miniboard.domain;
 
-import com.jyp.miniboard.member.dto.SignUpRequest;
-import com.jyp.miniboard.member.dto.MemberUpdateRequest;
+import com.jyp.miniboard.common.MemberType;
+import com.jyp.miniboard.dto.sign_up.SignUpRequest;
+import com.jyp.miniboard.dto.member.MemberUpdateRequest;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

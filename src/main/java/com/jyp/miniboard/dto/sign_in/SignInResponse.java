@@ -1,6 +1,6 @@
-package com.jyp.miniboard.member.dto;
+package com.jyp.miniboard.dto.sign_in;
 
-import com.jyp.miniboard.member.domain.MemberType;
+import com.jyp.miniboard.common.MemberType;
 
 public record SignInResponse(
         String name,

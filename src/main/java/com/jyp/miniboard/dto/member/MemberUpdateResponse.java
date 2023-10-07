@@ -1,6 +1,6 @@
-package com.jyp.miniboard.member.dto;
+package com.jyp.miniboard.dto.member;
 
-import com.jyp.miniboard.member.domain.Member;
+import com.jyp.miniboard.domain.Member;
 
 public record MemberUpdateResponse(
         boolean success,

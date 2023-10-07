@@ -1,8 +1,10 @@
-package com.jyp.miniboard.member.controller;
+package com.jyp.miniboard.controller;
 
-import com.jyp.miniboard.member.dto.*;
-import com.jyp.miniboard.member.service.SignService;
-import com.jyp.miniboard.member.service.TokenService;
+import com.jyp.miniboard.dto.sign_in.SignInRequest;
+import com.jyp.miniboard.dto.sign_in.SignInResponse;
+import com.jyp.miniboard.dto.sign_up.SignUpRequest;
+import com.jyp.miniboard.dto.sign_up.SignUpResponse;
+import com.jyp.miniboard.service.SignService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class SignController {
 
     private final SignService signService;
-    private final TokenService tokenService;
 
     @PostMapping("/api/v1/sign-up")
     public ResponseEntity<SignUpResponse> signUp(@RequestBody @Valid final SignUpRequest signUpRequest) {

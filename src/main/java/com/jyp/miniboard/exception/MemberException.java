@@ -1,4 +1,4 @@
-package com.jyp.miniboard.member.exception;
+package com.jyp.miniboard.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

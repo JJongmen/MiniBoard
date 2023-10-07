@@ -1,6 +1,6 @@
-package com.jyp.miniboard.member.repository;
+package com.jyp.miniboard.repository;
 
-import com.jyp.miniboard.member.domain.Member;
+import com.jyp.miniboard.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

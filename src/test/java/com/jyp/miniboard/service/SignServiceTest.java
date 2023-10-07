@@ -1,14 +1,15 @@
-package com.jyp.miniboard.member.service;
+package com.jyp.miniboard.service;
 
-import com.jyp.miniboard.member.domain.Member;
-import com.jyp.miniboard.member.dto.SignInRequest;
-import com.jyp.miniboard.member.dto.SignInResponse;
-import com.jyp.miniboard.member.dto.SignUpRequest;
-import com.jyp.miniboard.member.dto.SignUpResponse;
-import com.jyp.miniboard.member.exception.MemberErrorResult;
-import com.jyp.miniboard.member.exception.MemberException;
-import com.jyp.miniboard.member.repository.MemberRepository;
+import com.jyp.miniboard.domain.Member;
+import com.jyp.miniboard.dto.sign_in.SignInRequest;
+import com.jyp.miniboard.dto.sign_in.SignInResponse;
+import com.jyp.miniboard.dto.sign_up.SignUpRequest;
+import com.jyp.miniboard.dto.sign_up.SignUpResponse;
+import com.jyp.miniboard.exception.MemberErrorResult;
+import com.jyp.miniboard.exception.MemberException;
+import com.jyp.miniboard.repository.MemberRepository;
 import com.jyp.miniboard.security.TokenProvider;
+import com.jyp.miniboard.service.SignService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -1,4 +1,4 @@
-package com.jyp.miniboard.member.domain;
+package com.jyp.miniboard.common;
 
 public enum MemberType {
     USER,

@@ -1,4 +1,4 @@
-package com.jyp.miniboard.member.dto;
+package com.jyp.miniboard.dto.member;
 
 public record MemberUpdateRequest(
         String name,

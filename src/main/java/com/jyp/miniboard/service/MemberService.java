@@ -1,8 +1,8 @@
-package com.jyp.miniboard.member.service;
+package com.jyp.miniboard.service;
 
-import com.jyp.miniboard.member.dto.MemberUpdateRequest;
-import com.jyp.miniboard.member.dto.MemberUpdateResponse;
-import com.jyp.miniboard.member.repository.MemberRepository;
+import com.jyp.miniboard.dto.member.MemberUpdateRequest;
+import com.jyp.miniboard.dto.member.MemberUpdateResponse;
+import com.jyp.miniboard.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
