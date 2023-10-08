@@ -8,4 +8,5 @@ import lombok.RequiredArgsConstructor;
 public class MemberException extends RuntimeException{
 
     private final MemberErrorResult errorResult;
+
 }
