@@ -10,11 +10,15 @@ import com.jyp.miniboard.exception.MemberException;
 import com.jyp.miniboard.repository.MemberRepository;
 import com.jyp.miniboard.security.TokenProvider;
 import com.jyp.miniboard.service.SignService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -28,58 +32,60 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class SignServiceTest {
 
-    @InjectMocks
     private SignService signService;
     @Mock
     private MemberRepository memberRepository;
-    @Mock
+    @Spy
     private PasswordEncoder encoder;
-    @Mock
     private TokenProvider tokenProvider;
     private final Long id = -1L;
     private final String name = "name";
     private final String email = "name@email.com";
     private final String password = "password";
 
+    @BeforeEach
+    void setUp() {
+        tokenProvider = new TokenProvider("thisissecretkeythisissecretkeythisissecretkey", 1L, "issuer");
+        signService = new SignService(memberRepository, tokenProvider, encoder);
+    }
+
+    @Test
+    void signService가null이아님() {
+        assertThat(signService).isNotNull();
+    }
+
     @Test
     void 회원가입실패_중복된이메일() {
         // given
-        doReturn(true).when(memberRepository).existsByEmail(email);
-        final SignUpRequest request = new SignUpRequest(name, email, password);
+        doThrow(DataIntegrityViolationException.class).when(memberRepository).flush();
 
-        // when then
-        assertThatThrownBy(() -> {
-            signService.signUp(request);
-        }).isInstanceOf(MemberException.class)
-                .satisfies(e -> {
-                    final MemberException ex = (MemberException) e;
-                    assertThat(ex.getErrorResult()).isEqualTo(MemberErrorResult.DUPLICATED_MEMBER_EMAIL);
-                });
+        // when
+        final MemberException result = assertThrows(MemberException.class, () ->
+                signService.signUp(new SignUpRequest(name, email, password))
+        );
 
-        // verify
-        verify(memberRepository, times(1)).existsByEmail(email);
+        // then
+        assertThat(result.getErrorResult()).isEqualTo(MemberErrorResult.DUPLICATED_MEMBER_EMAIL);
     }
 
     @Test
     void 회원가입성공() {
         // given
-        doReturn(false).when(memberRepository).existsByEmail(email);
-        doReturn(member()).when(memberRepository).save(any(Member.class));
-        doReturn("encoded password").when(encoder).encode(any(String.class));
         final SignUpRequest request = new SignUpRequest(name, email, password);
+        doReturn(member()).when(memberRepository).save(any(Member.class));
 
         // when
         SignUpResponse result = signService.signUp(request);
 
         // then
-        assertThat(result.id()).isNotNull();
+        assertThat(result.id()).isEqualTo(id);
     }
 
     @Test
     void 로그인실패_이메일없음() {
         // given
-        doReturn(Optional.empty()).when(memberRepository).findByEmail(email);
         final SignInRequest request = new SignInRequest(email, password);
+        doReturn(Optional.empty()).when(memberRepository).findByEmail(email);
 
         // when then
         final MemberException result = assertThrows(MemberException.class, () -> {
@@ -93,8 +99,9 @@ public class SignServiceTest {
     @Test
     void 로그인실패_비밀번호틀림() {
         // given
-        doReturn(Optional.of(member())).when(memberRepository).findByEmail(email);
         final SignInRequest request = new SignInRequest(email, "wrong password");
+        doReturn(Optional.of(member())).when(memberRepository).findByEmail(email);
+        doReturn(false).when(encoder).matches(eq("wrong password"), anyString());
 
         // when
         final MemberException result = assertThrows(MemberException.class, () -> {
@@ -110,7 +117,6 @@ public class SignServiceTest {
         // given
         doReturn(Optional.of(member())).when(memberRepository).findByEmail(email);
         doReturn(true).when(encoder).matches(anyString(), anyString());
-        doReturn("token").when(tokenProvider).createToken(anyString());
         final SignInRequest request = new SignInRequest(email, password);
 
         // when
