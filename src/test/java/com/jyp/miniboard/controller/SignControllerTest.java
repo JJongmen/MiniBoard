@@ -1,6 +1,7 @@
 package com.jyp.miniboard.controller;
 
 import com.google.gson.Gson;
+import com.jyp.miniboard.dto.sign_in.SignInRequest;
 import com.jyp.miniboard.dto.sign_up.SignUpRequest;
 import com.jyp.miniboard.exception.MemberErrorResult;
 import com.jyp.miniboard.exception.MemberException;
@@ -14,11 +15,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -141,5 +141,96 @@ class SignControllerTest {
 
         // then
         resultActions.andExpect(status().isCreated());
+    }
+
+    @Test
+    void 로그인실패_email이없음() throws Exception {
+        // given
+        final String url = "/api/v1/sign-in";
+        final SignInRequest request = new SignInRequest(null, "password");
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(url)
+                        .content(gson.toJson(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void 로그인실패_password가없음() throws Exception {
+        // given
+        final String url = "/api/v1/sign-in";
+        final SignInRequest request = new SignInRequest("name@email.com", null);
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(url)
+                        .content(gson.toJson(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void 로그인실패_틀린email형식임() throws Exception {
+        // given
+        final String url = "/api/v1/sign-in";
+        final SignInRequest request = new SignInRequest("wrong email form", "password");
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(url)
+                        .content(gson.toJson(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void 로그인실패_존재하지않는이메일() throws Exception {
+        // given
+        final String url = "/api/v1/sign-in";
+        final SignInRequest request = new SignInRequest("name@email.com", "password");
+        doThrow(new MemberException(MemberErrorResult.INVALID_ID_OR_PASSWORD)).when(signService).signIn(request);
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(url)
+                        .content(gson.toJson(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpectAll(jsonPath("$.code").value("INVALID_ID_OR_PASSWORD"),
+                        jsonPath("$.message").value("잘못된 이메일 또는 비밀번호입니다."));
+    }
+
+    @Test
+    void 로그인실패_틀린비밀번호() throws Exception {
+        // given
+        final String url = "/api/v1/sign-in";
+        final SignInRequest request = new SignInRequest("name@email.com", "wrong password");
+        doThrow(new MemberException(MemberErrorResult.INVALID_ID_OR_PASSWORD)).when(signService).signIn(request);
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(url)
+                        .content(gson.toJson(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpectAll(jsonPath("$.code").value("INVALID_ID_OR_PASSWORD"),
+                        jsonPath("$.message").value("잘못된 이메일 또는 비밀번호입니다."));
     }
 }
