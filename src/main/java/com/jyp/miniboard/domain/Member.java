@@ -1,8 +1,8 @@
 package com.jyp.miniboard.domain;
 
 import com.jyp.miniboard.common.MemberType;
-import com.jyp.miniboard.dto.sign_up.SignUpRequest;
 import com.jyp.miniboard.dto.member.MemberUpdateRequest;
+import com.jyp.miniboard.dto.sign_up.SignUpRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
