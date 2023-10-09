@@ -1,7 +1,6 @@
 package com.jyp.miniboard.domain;
 
 import com.jyp.miniboard.common.MemberType;
-import com.jyp.miniboard.dto.member.MemberUpdateRequest;
 import com.jyp.miniboard.dto.sign_up.SignUpRequest;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,11 +28,5 @@ public class Member {
                 .password(encoder.encode(request.password()))
                 .type(MemberType.USER)
                 .build();
-    }
-
-    public void update(MemberUpdateRequest newMember, PasswordEncoder encoder) {
-        this.password = newMember.newPassword() == null || newMember.newPassword().isBlank()
-                ? this.password : encoder.encode(newMember.newPassword());
-        this.name = newMember.name();
     }
 }
