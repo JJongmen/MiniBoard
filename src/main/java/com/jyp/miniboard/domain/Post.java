@@ -15,4 +15,9 @@ public class Post {
     private String content;
     @ManyToOne
     private Member writer;
+
+    public void edit(final String title, final String content) {
+        this.title = title;
+        this.content = content;
+    }
 }

@@ -2,6 +2,7 @@ package com.jyp.miniboard.service;
 
 import com.jyp.miniboard.domain.Member;
 import com.jyp.miniboard.domain.Post;
+import com.jyp.miniboard.dto.EditPostRequest;
 import com.jyp.miniboard.dto.PostDetailResponse;
 import com.jyp.miniboard.dto.post.CreatePostRequest;
 import com.jyp.miniboard.dto.post.CreatePostResponse;
@@ -23,7 +24,8 @@ public class PostService {
     private final PostRepository postRepository;
 
     @Transactional
-    public CreatePostResponse createPost(final Long memberId, final CreatePostRequest request) {
+    public CreatePostResponse createPost(final Long memberId,
+                                         final CreatePostRequest request) {
         final Member writer = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MemberErrorResult.NOT_FOUND_MEMBER));
 
@@ -39,5 +41,21 @@ public class PostService {
                 .orElseThrow(() -> new PostException(PostErrorResult.NOT_FOUND_POST));
 
         return PostDetailResponse.from(post);
+    }
+
+    @Transactional
+    public void editPost(final Long memberId,
+                         final Long postId,
+                         final EditPostRequest editPostRequest) {
+        final Member editor = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MemberErrorResult.NOT_FOUND_MEMBER));
+        final Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(PostErrorResult.NOT_FOUND_POST));
+
+        if (!editor.getId().equals(post.getWriter().getId())) {
+            throw new MemberException(MemberErrorResult.NOT_MATCH_MEMBER);
+        }
+
+        post.edit(editPostRequest.title(), editPostRequest.content());
     }
 }
