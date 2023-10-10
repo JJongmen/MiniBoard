@@ -2,10 +2,13 @@ package com.jyp.miniboard.service;
 
 import com.jyp.miniboard.domain.Member;
 import com.jyp.miniboard.domain.Post;
+import com.jyp.miniboard.dto.PostDetailResponse;
 import com.jyp.miniboard.dto.post.CreatePostRequest;
 import com.jyp.miniboard.dto.post.CreatePostResponse;
 import com.jyp.miniboard.exception.MemberErrorResult;
 import com.jyp.miniboard.exception.MemberException;
+import com.jyp.miniboard.exception.PostErrorResult;
+import com.jyp.miniboard.exception.PostException;
 import com.jyp.miniboard.repository.MemberRepository;
 import com.jyp.miniboard.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +31,13 @@ public class PostService {
 
         final Post savedPost = postRepository.save(postForSave);
         return new CreatePostResponse(savedPost.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public PostDetailResponse getPostDetail(final Long postId) {
+        final Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(PostErrorResult.NOT_FOUND_POST));
+
+        return PostDetailResponse.from(post);
     }
 }
