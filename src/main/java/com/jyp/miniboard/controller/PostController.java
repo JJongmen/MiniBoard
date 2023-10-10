@@ -1,5 +1,6 @@
 package com.jyp.miniboard.controller;
 
+import com.jyp.miniboard.dto.PostDetailResponse;
 import com.jyp.miniboard.dto.post.CreatePostRequest;
 import com.jyp.miniboard.dto.post.CreatePostResponse;
 import com.jyp.miniboard.security.UserAuthorize;
@@ -10,9 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,5 +30,11 @@ public class PostController {
 
     private static long getMemberId(final User user) {
         return Long.parseLong(user.getUsername());
+    }
+
+    @GetMapping("/api/v1/posts/{postId}")
+    public ResponseEntity<PostDetailResponse> getPostDetail(@PathVariable final Long postId) {
+        final PostDetailResponse response = postService.getPostDetail(postId);
+        return ResponseEntity.ok(response);
     }
 }

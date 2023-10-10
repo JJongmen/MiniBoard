@@ -2,7 +2,10 @@ package com.jyp.miniboard.controller;
 
 import com.google.gson.Gson;
 import com.jyp.miniboard.common.GlobalExceptionHandler;
+import com.jyp.miniboard.dto.PostDetailResponse;
 import com.jyp.miniboard.dto.post.CreatePostRequest;
+import com.jyp.miniboard.exception.PostErrorResult;
+import com.jyp.miniboard.exception.PostException;
 import com.jyp.miniboard.security.JwtAuthenticationFilter;
 import com.jyp.miniboard.service.PostService;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +29,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = PostController.class,
@@ -97,5 +103,55 @@ public class PostControllerTest {
 
         // then
         resultActions.andExpect(status().isCreated());
+    }
+
+    @Test
+    void 게시글조회실패_postId가문자열임() throws Exception {
+        // given
+        final String url = "/api/v1/posts/{postId}";
+        final String postId = "invalidstring";
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.get(url, postId)
+        );
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void 게시글조회실패_존재하지않는게시글임() throws Exception {
+        // given
+        final String url = "/api/v1/posts/{postId}";
+        final Long postId = 1L;
+        doThrow(new PostException(PostErrorResult.NOT_FOUND_POST)).when(postService).getPostDetail(postId);
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.get(url, postId)
+        );
+
+        // then
+        resultActions.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(PostErrorResult.NOT_FOUND_POST.name()));
+    }
+
+    @Test
+    void 게시글조회성공() throws Exception {
+        // given
+        final String url = "/api/v1/posts/{postId}";
+        doReturn(new PostDetailResponse("title", "content", "name")).when(postService).getPostDetail(1L);
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.get(url, 1L)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("title"))
+                .andExpect(jsonPath("$.content").value("content"))
+                .andExpect(jsonPath("$.writerName").value("name"));
     }
 }

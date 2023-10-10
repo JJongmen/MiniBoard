@@ -2,6 +2,8 @@ package com.jyp.miniboard.common;
 
 import com.jyp.miniboard.exception.MemberErrorResult;
 import com.jyp.miniboard.exception.MemberException;
+import com.jyp.miniboard.exception.PostErrorResult;
+import com.jyp.miniboard.exception.PostException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
@@ -49,6 +51,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return this.makeErrorResponseEntity(exception.getErrorResult());
     }
 
+    @ExceptionHandler({PostException.class})
+    public ResponseEntity<ErrorResponse> handleRestApiException(final PostException exception) {
+        log.warn("PostException occur: ", exception);
+        return this.makeErrorResponseEntity(exception.getErrorResult());
+    }
+
     @ExceptionHandler({AccessDeniedException.class})
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(final AccessDeniedException exception) {
         log.warn("AccessDeniedException occur: ", exception);
@@ -62,6 +70,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<ErrorResponse> makeErrorResponseEntity(final MemberErrorResult errorResult) {
+        return ResponseEntity.status(errorResult.getHttpStatus())
+                .body(new ErrorResponse(errorResult.name(), errorResult.getMessage()));
+    }
+
+    private ResponseEntity<ErrorResponse> makeErrorResponseEntity(final PostErrorResult errorResult) {
         return ResponseEntity.status(errorResult.getHttpStatus())
                 .body(new ErrorResponse(errorResult.name(), errorResult.getMessage()));
     }
