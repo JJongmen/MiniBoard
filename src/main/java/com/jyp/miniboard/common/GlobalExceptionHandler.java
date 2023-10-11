@@ -1,9 +1,6 @@
 package com.jyp.miniboard.common;
 
-import com.jyp.miniboard.exception.MemberErrorResult;
-import com.jyp.miniboard.exception.MemberException;
-import com.jyp.miniboard.exception.PostErrorResult;
-import com.jyp.miniboard.exception.PostException;
+import com.jyp.miniboard.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
@@ -44,16 +41,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(HttpStatus.BAD_REQUEST.toString(), errorDescription));
     }
-
-    @ExceptionHandler({MemberException.class})
-    public ResponseEntity<ErrorResponse> handleRestApiException(final MemberException exception) {
-        log.warn("MembershipException occur: ", exception);
-        return this.makeErrorResponseEntity(exception.getErrorResult());
-    }
-
-    @ExceptionHandler({PostException.class})
-    public ResponseEntity<ErrorResponse> handleRestApiException(final PostException exception) {
-        log.warn("PostException occur: ", exception);
+    @ExceptionHandler({BaseException.class})
+    public ResponseEntity<ErrorResponse> handleRestApiException(final BaseException exception) {
+        log.warn("{} occur: ", exception.getClass().getSimpleName(), exception);
         return this.makeErrorResponseEntity(exception.getErrorResult());
     }
 
@@ -69,12 +59,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return this.makeErrorResponseEntity(MemberErrorResult.UNKNOWN_EXCEPTION);
     }
 
-    private ResponseEntity<ErrorResponse> makeErrorResponseEntity(final MemberErrorResult errorResult) {
-        return ResponseEntity.status(errorResult.getHttpStatus())
-                .body(new ErrorResponse(errorResult.name(), errorResult.getMessage()));
-    }
-
-    private ResponseEntity<ErrorResponse> makeErrorResponseEntity(final PostErrorResult errorResult) {
+    private ResponseEntity<ErrorResponse> makeErrorResponseEntity(final BaseErrorResult errorResult) {
         return ResponseEntity.status(errorResult.getHttpStatus())
                 .body(new ErrorResponse(errorResult.name(), errorResult.getMessage()));
     }
