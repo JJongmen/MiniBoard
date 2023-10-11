@@ -255,7 +255,7 @@ public class PostControllerTest {
             );
 
             // then
-            resultActions.andExpect(status().isOk());
+            resultActions.andExpect(status().isNoContent());
         }
     }
 
@@ -310,7 +310,7 @@ public class PostControllerTest {
             );
 
             // then
-            resultActions.andExpect(status().isOk());
+            resultActions.andExpect(status().isNoContent());
         }
     }
 }

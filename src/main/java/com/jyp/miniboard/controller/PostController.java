@@ -45,7 +45,7 @@ public class PostController {
             @PathVariable final Long postId,
             @RequestBody @Valid final EditPostRequest editPostRequest) {
         postService.editPost(getMemberId(user), postId, editPostRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/api/v1/posts/{postId}")
@@ -53,6 +53,6 @@ public class PostController {
             @AuthenticationPrincipal User user,
             @PathVariable final Long postId) {
         postService.deletePost(getMemberId(user), postId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }
