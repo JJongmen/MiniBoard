@@ -1,6 +1,7 @@
 package com.jyp.miniboard.controller;
 
 import com.jyp.miniboard.dto.EditPostRequest;
+import com.jyp.miniboard.dto.GetPostListResponse;
 import com.jyp.miniboard.dto.PostDetailResponse;
 import com.jyp.miniboard.dto.post.CreatePostRequest;
 import com.jyp.miniboard.dto.post.CreatePostResponse;
@@ -54,5 +55,11 @@ public class PostController {
             @PathVariable final Long postId) {
         postService.deletePost(getMemberId(user), postId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/api/v1/posts")
+    public ResponseEntity<GetPostListResponse> getPostList() {
+        final GetPostListResponse response = postService.getPostList();
+        return ResponseEntity.ok(response);
     }
 }

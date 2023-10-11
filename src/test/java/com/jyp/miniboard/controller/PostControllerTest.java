@@ -3,6 +3,7 @@ package com.jyp.miniboard.controller;
 import com.google.gson.Gson;
 import com.jyp.miniboard.common.GlobalExceptionHandler;
 import com.jyp.miniboard.dto.EditPostRequest;
+import com.jyp.miniboard.dto.GetPostListResponse;
 import com.jyp.miniboard.dto.PostDetailResponse;
 import com.jyp.miniboard.dto.post.CreatePostRequest;
 import com.jyp.miniboard.exception.MemberErrorResult;
@@ -30,6 +31,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -311,6 +313,28 @@ public class PostControllerTest {
 
             // then
             resultActions.andExpect(status().isNoContent());
+        }
+    }
+
+    @Nested
+    class 게시글목록조회 {
+        @Test
+        void 게시글목록조회성공() throws Exception {
+            // given
+            final String url = "/api/v1/posts";
+            doReturn(new GetPostListResponse(List.of(new GetPostListResponse.PostSummary(1L, "title", "writer"))))
+                    .when(postService).getPostList();
+
+            // when
+            final ResultActions resultActions = mockMvc.perform(
+                    MockMvcRequestBuilders.get(url)
+            );
+
+            // then
+            resultActions.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.posts").isArray())
+                    .andExpect(jsonPath("$.posts[0].id").value(1L))
+                    .andExpect(jsonPath("$.posts[0].title").value("title"));
         }
     }
 }
