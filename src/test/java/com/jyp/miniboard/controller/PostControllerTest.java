@@ -258,4 +258,59 @@ public class PostControllerTest {
             resultActions.andExpect(status().isOk());
         }
     }
+
+    @Nested
+    class 게시글삭제 {
+        @Test
+        @WithMockUser(username = "1")
+        void 게시글삭제실패_존재하지않는게시글임() throws Exception {
+            // given
+            final String url = "/api/v1/posts/{postId}";
+            final long postId = 1L;
+            doThrow(new PostException(PostErrorResult.NOT_FOUND_POST)).when(postService).deletePost(1L, postId);
+
+            // when
+            final ResultActions resultActions = mockMvc.perform(
+                    MockMvcRequestBuilders.delete(url, postId)
+            );
+
+            // then
+            resultActions.andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value(PostErrorResult.NOT_FOUND_POST.name()));
+        }
+
+        @Test
+        @WithMockUser(username = "1")
+        void 게시글삭제실패_본인의게시글이아님() throws Exception {
+            // given
+            final String url = "/api/v1/posts/{postId}";
+            final long postId = 1L;
+            doThrow(new MemberException(MemberErrorResult.NOT_MATCH_MEMBER)).when(postService).deletePost(1L, postId);
+
+            // when
+            final ResultActions resultActions = mockMvc.perform(
+                    MockMvcRequestBuilders.delete(url, postId)
+            );
+
+            // then
+            resultActions.andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.code").value(MemberErrorResult.NOT_MATCH_MEMBER.name()));
+        }
+
+        @Test
+        @WithMockUser(username = "1")
+        void 게시글삭제성공() throws Exception {
+            // given
+            final String url = "/api/v1/posts/{postId}";
+            final long postId = 1L;
+
+            // when
+            final ResultActions resultActions = mockMvc.perform(
+                    MockMvcRequestBuilders.delete(url, postId)
+            );
+
+            // then
+            resultActions.andExpect(status().isOk());
+        }
+    }
 }

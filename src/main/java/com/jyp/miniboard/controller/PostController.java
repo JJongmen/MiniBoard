@@ -47,4 +47,12 @@ public class PostController {
         postService.editPost(getMemberId(user), postId, editPostRequest);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/api/v1/posts/{postId}")
+    public ResponseEntity<Void> editPost(
+            @AuthenticationPrincipal User user,
+            @PathVariable final Long postId) {
+        postService.deletePost(getMemberId(user), postId);
+        return ResponseEntity.ok().build();
+    }
 }
