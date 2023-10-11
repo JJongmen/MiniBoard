@@ -1,5 +1,6 @@
 package com.jyp.miniboard.controller;
 
+import com.jyp.miniboard.dto.EditPostRequest;
 import com.jyp.miniboard.dto.PostDetailResponse;
 import com.jyp.miniboard.dto.post.CreatePostRequest;
 import com.jyp.miniboard.dto.post.CreatePostResponse;
@@ -36,5 +37,14 @@ public class PostController {
     public ResponseEntity<PostDetailResponse> getPostDetail(@PathVariable final Long postId) {
         final PostDetailResponse response = postService.getPostDetail(postId);
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/api/v1/posts/{postId}")
+    public ResponseEntity<Void> editPost(
+            @AuthenticationPrincipal User user,
+            @PathVariable final Long postId,
+            @RequestBody @Valid final EditPostRequest editPostRequest) {
+        postService.editPost(getMemberId(user), postId, editPostRequest);
+        return ResponseEntity.ok().build();
     }
 }

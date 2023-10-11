@@ -2,8 +2,11 @@ package com.jyp.miniboard.controller;
 
 import com.google.gson.Gson;
 import com.jyp.miniboard.common.GlobalExceptionHandler;
+import com.jyp.miniboard.dto.EditPostRequest;
 import com.jyp.miniboard.dto.PostDetailResponse;
 import com.jyp.miniboard.dto.post.CreatePostRequest;
+import com.jyp.miniboard.exception.MemberErrorResult;
+import com.jyp.miniboard.exception.MemberException;
 import com.jyp.miniboard.exception.PostErrorResult;
 import com.jyp.miniboard.exception.PostException;
 import com.jyp.miniboard.security.JwtAuthenticationFilter;
@@ -153,5 +156,94 @@ public class PostControllerTest {
                 .andExpect(jsonPath("$.title").value("title"))
                 .andExpect(jsonPath("$.content").value("content"))
                 .andExpect(jsonPath("$.writerName").value("name"));
+    }
+
+    @ParameterizedTest(name = "{1}")
+    @MethodSource("provideInvalidEditPostRequests")
+    @WithMockUser(username = "1")
+    void 게시글수정실패_잘못된파라미터(final EditPostRequest request, final String description) throws Exception {
+        // given
+        final String url = "/api/v1/posts/{postId}";
+        final long postId = 1L;
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.put(url, postId)
+                        .content(gson.toJson(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
+    }
+
+    private static Stream<Arguments> provideInvalidEditPostRequests() {
+        return Stream.of(
+                Arguments.of(new EditPostRequest(null, "content"), "제목이 null임"),
+                Arguments.of(new EditPostRequest("", "content"), "제목이 빈문자열임"),
+                Arguments.of(new EditPostRequest("title", null), "내용이 null임"),
+                Arguments.of(new EditPostRequest("title", ""), "내용이 빈문자열임")
+        );
+    }
+
+    @Test
+    @WithMockUser(username = "1")
+    void 게시글수정실패_존재하지않는게시글임() throws Exception {
+        // given
+        final String url = "/api/v1/posts/{postId}";
+        final long postId = 1L;
+        final EditPostRequest request = new EditPostRequest("title", "content");
+        doThrow(new PostException(PostErrorResult.NOT_FOUND_POST)).when(postService).editPost(1L, postId, request);
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.put(url, postId)
+                        .content(gson.toJson(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(PostErrorResult.NOT_FOUND_POST.name()));
+    }
+
+    @Test
+    @WithMockUser(username = "1")
+    void 게시글수정실패_본인의게시글이아님() throws Exception {
+        // given
+        final String url = "/api/v1/posts/{postId}";
+        final long postId = 1L;
+        final EditPostRequest request = new EditPostRequest("title", "content");
+        doThrow(new MemberException(MemberErrorResult.NOT_MATCH_MEMBER)).when(postService).editPost(1L, postId, request);
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.put(url, postId)
+                        .content(gson.toJson(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(MemberErrorResult.NOT_MATCH_MEMBER.name()));
+    }
+
+    @Test
+    @WithMockUser(username = "1")
+    void 게시글수정성공() throws Exception {
+        // given
+        final String url = "/api/v1/posts/{postId}";
+        final long postId = 1L;
+        final EditPostRequest request = new EditPostRequest("title", "content");
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.put(url, postId)
+                        .content(gson.toJson(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk());
     }
 }
