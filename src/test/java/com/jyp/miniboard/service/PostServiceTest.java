@@ -23,8 +23,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class PostServiceTest {
@@ -184,5 +183,60 @@ public class PostServiceTest {
         // then
         assertThat(post.getTitle()).isEqualTo("changed title");
         assertThat(post.getContent()).isEqualTo("changed content");
+    }
+
+    @Test
+    void 게시글삭제실패_존재하지않는회원() {
+        // given
+        doThrow(new MemberException(MemberErrorResult.NOT_FOUND_MEMBER)).when(memberRepository).findById(memberId);
+
+        // when
+        final MemberException result = assertThrows(MemberException.class, () ->
+                postService.deletePost(memberId, postId));
+
+        // then
+        assertThat(result.getErrorResult()).isEqualTo(MemberErrorResult.NOT_FOUND_MEMBER);
+    }
+
+    @Test
+    void 게시글삭제실패_존재하지않는게시글() {
+        // given
+        doReturn(Optional.of(member())).when(memberRepository).findById(memberId);
+        doThrow(new PostException(PostErrorResult.NOT_FOUND_POST)).when(postRepository).findById(postId);
+
+        // when
+        final PostException result = assertThrows(PostException.class, () ->
+                postService.deletePost(memberId, postId));
+
+        // then
+        assertThat(result.getErrorResult()).isEqualTo(PostErrorResult.NOT_FOUND_POST);
+    }
+
+    @Test
+    void 게시글삭제실패_본인의게시글이아님() {
+        // given
+        doReturn(Optional.of(member())).when(memberRepository).findById(memberId);
+        doReturn(Optional.of(postWithMember(Member.builder().id(-999L).build()))).when(postRepository).findById(postId);
+
+        // when
+        final MemberException result = assertThrows(MemberException.class, () ->
+                postService.deletePost(memberId, postId));
+
+        // then
+        assertThat(result.getErrorResult()).isEqualTo(MemberErrorResult.NOT_MATCH_MEMBER);
+    }
+
+    @Test
+    void 게시글삭제성공() {
+        // given
+        doReturn(Optional.of(member())).when(memberRepository).findById(memberId);
+        final Post post = post();
+        doReturn(Optional.of(post)).when(postRepository).findById(postId);
+
+        // when
+        postService.deletePost(memberId, postId);
+
+        // then
+        verify(postRepository, times(1)).delete(post);
     }
 }

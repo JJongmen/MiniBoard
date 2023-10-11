@@ -63,5 +63,13 @@ public class PostService {
     public void deletePost(final Long memberId, final Long postId) {
         final Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MemberErrorResult.NOT_FOUND_MEMBER));
+        final Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(PostErrorResult.NOT_FOUND_POST));
+
+        if (!post.isWrittenBy(member)) {
+            throw new MemberException(MemberErrorResult.NOT_MATCH_MEMBER);
+        }
+
+        postRepository.delete(post);
     }
 }
