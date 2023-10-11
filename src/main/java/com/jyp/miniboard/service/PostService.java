@@ -3,6 +3,7 @@ package com.jyp.miniboard.service;
 import com.jyp.miniboard.domain.Member;
 import com.jyp.miniboard.domain.Post;
 import com.jyp.miniboard.dto.EditPostRequest;
+import com.jyp.miniboard.dto.GetPostListResponse;
 import com.jyp.miniboard.dto.PostDetailResponse;
 import com.jyp.miniboard.dto.post.CreatePostRequest;
 import com.jyp.miniboard.dto.post.CreatePostResponse;
@@ -15,6 +16,8 @@ import com.jyp.miniboard.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -71,5 +74,10 @@ public class PostService {
         }
 
         postRepository.delete(post);
+    }
+
+    public GetPostListResponse getPostList() {
+        final List<Post> posts = postRepository.findAll();
+        return GetPostListResponse.from(posts);
     }
 }

@@ -3,6 +3,7 @@ package com.jyp.miniboard.service;
 import com.jyp.miniboard.domain.Member;
 import com.jyp.miniboard.domain.Post;
 import com.jyp.miniboard.dto.EditPostRequest;
+import com.jyp.miniboard.dto.GetPostListResponse;
 import com.jyp.miniboard.dto.PostDetailResponse;
 import com.jyp.miniboard.dto.post.CreatePostRequest;
 import com.jyp.miniboard.dto.post.CreatePostResponse;
@@ -19,8 +20,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -227,6 +230,23 @@ public class PostServiceTest {
 
             // then
             verify(postRepository, times(1)).delete(post);
+        }
+    }
+
+    @Nested
+    class 게시글목록조회 {
+        @Test
+        void 게시글목록조회성공() {
+            // given
+            doReturn(List.of(post(), post())).when(postRepository).findAll();
+
+            // when
+            GetPostListResponse result = postService.getPostList();
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.posts().size()).isEqualTo(2);
+            assertThat(result.posts().get(0).title()).isEqualTo("title");
         }
     }
 
