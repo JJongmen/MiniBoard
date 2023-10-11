@@ -12,6 +12,7 @@ import com.jyp.miniboard.exception.PostException;
 import com.jyp.miniboard.security.JwtAuthenticationFilter;
 import com.jyp.miniboard.service.PostService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -62,188 +63,199 @@ public class PostControllerTest {
         assertThat(mockMvc).isNotNull();
     }
 
-    @ParameterizedTest(name = "{1}")
-    @MethodSource("provideInvalidCreatePostRequests")
-    @WithMockUser(authorities = "USER")
-    void 게시글작성실패_잘못된파라미터(CreatePostRequest request, String description) throws Exception {
-        // given
-        final String url = "/api/v1/posts";
+    @Nested
+    class 게시글작성 {
+        @ParameterizedTest(name = "{1}")
+        @MethodSource("provideInvalidCreatePostRequests")
+        @WithMockUser(authorities = "USER")
+        void 게시글작성실패_잘못된파라미터(CreatePostRequest request, String description) throws Exception {
+            // given
+            final String url = "/api/v1/posts";
 
-        // when
-        final ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(url)
-                        .content(gson.toJson(request))
-                        .contentType(MediaType.APPLICATION_JSON)
+            // when
+            final ResultActions resultActions = mockMvc.perform(
+                    MockMvcRequestBuilders.post(url)
+                            .content(gson.toJson(request))
+                            .contentType(MediaType.APPLICATION_JSON)
 
-        );
+            );
 
-        // then
-        resultActions.andExpect(status().isBadRequest());
+            // then
+            resultActions.andExpect(status().isBadRequest());
+        }
+
+        private static Stream<Arguments> provideInvalidCreatePostRequests() {
+            return Stream.of(
+                    Arguments.of(new CreatePostRequest(null, "content"), "제목이 null임"),
+                    Arguments.of(new CreatePostRequest("", "content"), "제목이 빈문자열임"),
+                    Arguments.of(new CreatePostRequest("title", null), "내용이 null임"),
+                    Arguments.of(new CreatePostRequest("title", ""), "내용이 빈문자열임")
+            );
+        }
+
+        @Test
+        @WithMockUser(username = "1")
+        void 게시글작성성공() throws Exception {
+            // given
+            final String url = "/api/v1/posts";
+            final CreatePostRequest request = new CreatePostRequest("title", "content");
+
+            // when
+            final ResultActions resultActions = mockMvc.perform(
+                    MockMvcRequestBuilders.post(url)
+                            .content(gson.toJson(request))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
+
+            // then
+            resultActions.andExpect(status().isCreated());
+        }
     }
 
-    private static Stream<Arguments> provideInvalidCreatePostRequests() {
-        return Stream.of(
-                Arguments.of(new CreatePostRequest(null, "content"), "제목이 null임"),
-                Arguments.of(new CreatePostRequest("", "content"), "제목이 빈문자열임"),
-                Arguments.of(new CreatePostRequest("title", null), "내용이 null임"),
-                Arguments.of(new CreatePostRequest("title", ""), "내용이 빈문자열임")
-        );
+    @Nested
+    class 게시글조회 {
+
+        @Test
+        void 게시글조회실패_postId가문자열임() throws Exception {
+            // given
+            final String url = "/api/v1/posts/{postId}";
+            final String postId = "invalidstring";
+
+            // when
+            final ResultActions resultActions = mockMvc.perform(
+                    MockMvcRequestBuilders.get(url, postId)
+            );
+
+            // then
+            resultActions.andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void 게시글조회실패_존재하지않는게시글임() throws Exception {
+            // given
+            final String url = "/api/v1/posts/{postId}";
+            final Long postId = 1L;
+            doThrow(new PostException(PostErrorResult.NOT_FOUND_POST)).when(postService).getPostDetail(postId);
+
+            // when
+            final ResultActions resultActions = mockMvc.perform(
+                    MockMvcRequestBuilders.get(url, postId)
+            );
+
+            // then
+            resultActions.andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value(PostErrorResult.NOT_FOUND_POST.name()));
+        }
+
+        @Test
+        void 게시글조회성공() throws Exception {
+            // given
+            final String url = "/api/v1/posts/{postId}";
+            doReturn(new PostDetailResponse("title", "content", "name")).when(postService).getPostDetail(1L);
+
+            // when
+            final ResultActions resultActions = mockMvc.perform(
+                    MockMvcRequestBuilders.get(url, 1L)
+            );
+
+            // then
+            resultActions.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.title").value("title"))
+                    .andExpect(jsonPath("$.content").value("content"))
+                    .andExpect(jsonPath("$.writerName").value("name"));
+        }
     }
 
-    @Test
-    @WithMockUser(username = "1")
-    void 게시글작성성공() throws Exception {
-        // given
-        final String url = "/api/v1/posts";
-        final CreatePostRequest request = new CreatePostRequest("title", "content");
+    @Nested
+    class 게시글수정 {
 
-        // when
-        final ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(url)
-                        .content(gson.toJson(request))
-                        .contentType(MediaType.APPLICATION_JSON)
-        );
+        @ParameterizedTest(name = "{1}")
+        @MethodSource("provideInvalidEditPostRequests")
+        @WithMockUser(username = "1")
+        void 게시글수정실패_잘못된파라미터(final EditPostRequest request, final String description) throws Exception {
+            // given
+            final String url = "/api/v1/posts/{postId}";
+            final long postId = 1L;
 
-        // then
-        resultActions.andExpect(status().isCreated());
-    }
+            // when
+            final ResultActions resultActions = mockMvc.perform(
+                    MockMvcRequestBuilders.put(url, postId)
+                            .content(gson.toJson(request))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
 
-    @Test
-    void 게시글조회실패_postId가문자열임() throws Exception {
-        // given
-        final String url = "/api/v1/posts/{postId}";
-        final String postId = "invalidstring";
+            // then
+            resultActions.andExpect(status().isBadRequest());
+        }
 
-        // when
-        final ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.get(url, postId)
-        );
+        private static Stream<Arguments> provideInvalidEditPostRequests() {
+            return Stream.of(
+                    Arguments.of(new EditPostRequest(null, "content"), "제목이 null임"),
+                    Arguments.of(new EditPostRequest("", "content"), "제목이 빈문자열임"),
+                    Arguments.of(new EditPostRequest("title", null), "내용이 null임"),
+                    Arguments.of(new EditPostRequest("title", ""), "내용이 빈문자열임")
+            );
+        }
 
-        // then
-        resultActions.andExpect(status().isBadRequest());
-    }
+        @Test
+        @WithMockUser(username = "1")
+        void 게시글수정실패_존재하지않는게시글임() throws Exception {
+            // given
+            final String url = "/api/v1/posts/{postId}";
+            final long postId = 1L;
+            final EditPostRequest request = new EditPostRequest("title", "content");
+            doThrow(new PostException(PostErrorResult.NOT_FOUND_POST)).when(postService).editPost(1L, postId, request);
 
-    @Test
-    void 게시글조회실패_존재하지않는게시글임() throws Exception {
-        // given
-        final String url = "/api/v1/posts/{postId}";
-        final Long postId = 1L;
-        doThrow(new PostException(PostErrorResult.NOT_FOUND_POST)).when(postService).getPostDetail(postId);
+            // when
+            final ResultActions resultActions = mockMvc.perform(
+                    MockMvcRequestBuilders.put(url, postId)
+                            .content(gson.toJson(request))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
 
-        // when
-        final ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.get(url, postId)
-        );
+            // then
+            resultActions.andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value(PostErrorResult.NOT_FOUND_POST.name()));
+        }
 
-        // then
-        resultActions.andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.code").value(PostErrorResult.NOT_FOUND_POST.name()));
-    }
+        @Test
+        @WithMockUser(username = "1")
+        void 게시글수정실패_본인의게시글이아님() throws Exception {
+            // given
+            final String url = "/api/v1/posts/{postId}";
+            final long postId = 1L;
+            final EditPostRequest request = new EditPostRequest("title", "content");
+            doThrow(new MemberException(MemberErrorResult.NOT_MATCH_MEMBER)).when(postService).editPost(1L, postId, request);
 
-    @Test
-    void 게시글조회성공() throws Exception {
-        // given
-        final String url = "/api/v1/posts/{postId}";
-        doReturn(new PostDetailResponse("title", "content", "name")).when(postService).getPostDetail(1L);
+            // when
+            final ResultActions resultActions = mockMvc.perform(
+                    MockMvcRequestBuilders.put(url, postId)
+                            .content(gson.toJson(request))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
 
-        // when
-        final ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.get(url, 1L)
-        );
+            // then
+            resultActions.andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.code").value(MemberErrorResult.NOT_MATCH_MEMBER.name()));
+        }
 
-        // then
-        resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("title"))
-                .andExpect(jsonPath("$.content").value("content"))
-                .andExpect(jsonPath("$.writerName").value("name"));
-    }
+        @Test
+        @WithMockUser(username = "1")
+        void 게시글수정성공() throws Exception {
+            // given
+            final String url = "/api/v1/posts/{postId}";
+            final long postId = 1L;
+            final EditPostRequest request = new EditPostRequest("title", "content");
 
-    @ParameterizedTest(name = "{1}")
-    @MethodSource("provideInvalidEditPostRequests")
-    @WithMockUser(username = "1")
-    void 게시글수정실패_잘못된파라미터(final EditPostRequest request, final String description) throws Exception {
-        // given
-        final String url = "/api/v1/posts/{postId}";
-        final long postId = 1L;
+            // when
+            final ResultActions resultActions = mockMvc.perform(
+                    MockMvcRequestBuilders.put(url, postId)
+                            .content(gson.toJson(request))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
 
-        // when
-        final ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.put(url, postId)
-                        .content(gson.toJson(request))
-                        .contentType(MediaType.APPLICATION_JSON)
-        );
-
-        // then
-        resultActions.andExpect(status().isBadRequest());
-    }
-
-    private static Stream<Arguments> provideInvalidEditPostRequests() {
-        return Stream.of(
-                Arguments.of(new EditPostRequest(null, "content"), "제목이 null임"),
-                Arguments.of(new EditPostRequest("", "content"), "제목이 빈문자열임"),
-                Arguments.of(new EditPostRequest("title", null), "내용이 null임"),
-                Arguments.of(new EditPostRequest("title", ""), "내용이 빈문자열임")
-        );
-    }
-
-    @Test
-    @WithMockUser(username = "1")
-    void 게시글수정실패_존재하지않는게시글임() throws Exception {
-        // given
-        final String url = "/api/v1/posts/{postId}";
-        final long postId = 1L;
-        final EditPostRequest request = new EditPostRequest("title", "content");
-        doThrow(new PostException(PostErrorResult.NOT_FOUND_POST)).when(postService).editPost(1L, postId, request);
-
-        // when
-        final ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.put(url, postId)
-                        .content(gson.toJson(request))
-                        .contentType(MediaType.APPLICATION_JSON)
-        );
-
-        // then
-        resultActions.andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.code").value(PostErrorResult.NOT_FOUND_POST.name()));
-    }
-
-    @Test
-    @WithMockUser(username = "1")
-    void 게시글수정실패_본인의게시글이아님() throws Exception {
-        // given
-        final String url = "/api/v1/posts/{postId}";
-        final long postId = 1L;
-        final EditPostRequest request = new EditPostRequest("title", "content");
-        doThrow(new MemberException(MemberErrorResult.NOT_MATCH_MEMBER)).when(postService).editPost(1L, postId, request);
-
-        // when
-        final ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.put(url, postId)
-                        .content(gson.toJson(request))
-                        .contentType(MediaType.APPLICATION_JSON)
-        );
-
-        // then
-        resultActions.andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value(MemberErrorResult.NOT_MATCH_MEMBER.name()));
-    }
-
-    @Test
-    @WithMockUser(username = "1")
-    void 게시글수정성공() throws Exception {
-        // given
-        final String url = "/api/v1/posts/{postId}";
-        final long postId = 1L;
-        final EditPostRequest request = new EditPostRequest("title", "content");
-
-        // when
-        final ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.put(url, postId)
-                        .content(gson.toJson(request))
-                        .contentType(MediaType.APPLICATION_JSON)
-        );
-
-        // then
-        resultActions.andExpect(status().isOk());
+            // then
+            resultActions.andExpect(status().isOk());
+        }
     }
 }
