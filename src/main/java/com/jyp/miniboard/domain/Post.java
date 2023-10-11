@@ -20,4 +20,8 @@ public class Post {
         this.title = title;
         this.content = content;
     }
+
+    public boolean isWrittenBy(final Member member) {
+        return writer.getId().equals(member.getId());
+    }
 }

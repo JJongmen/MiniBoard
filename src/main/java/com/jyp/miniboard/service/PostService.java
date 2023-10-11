@@ -52,10 +52,16 @@ public class PostService {
         final Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(PostErrorResult.NOT_FOUND_POST));
 
-        if (!editor.getId().equals(post.getWriter().getId())) {
+        if (!post.isWrittenBy(editor)) {
             throw new MemberException(MemberErrorResult.NOT_MATCH_MEMBER);
         }
 
         post.edit(editPostRequest.title(), editPostRequest.content());
+    }
+
+    @Transactional
+    public void deletePost(final Long memberId, final Long postId) {
+        final Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MemberErrorResult.NOT_FOUND_MEMBER));
     }
 }
