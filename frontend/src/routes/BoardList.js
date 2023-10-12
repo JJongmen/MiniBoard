@@ -1,6 +1,5 @@
 import React from "react";
 import { Table, Pagination } from "react-bootstrap";
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 let active = 1;
 let items = [];
@@ -8,14 +7,13 @@ for (let number = 1; number <= 5; number++) {
   items.push(
     <Pagination.Item key={number} active={number === active}>
       {number}
-    </Pagination.Item>,
+    </Pagination.Item>
   );
 }
 
-
 const BoardList = () => {
     return (
-    <div>
+    <div style={{ margin: '20px' }}>
     <Table striped bordered hover>
       <thead>
         <tr>
@@ -43,7 +41,9 @@ const BoardList = () => {
       </tbody>
     </Table>
 
-    <Pagination style={{ marginTop: '20px' }}>{items}</Pagination>
+    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+      <Pagination>{items}</Pagination>
+    </div>
     </div>
   );
 };
