@@ -5,6 +5,7 @@ import com.jyp.miniboard.domain.Post;
 import com.jyp.miniboard.dto.EditPostRequest;
 import com.jyp.miniboard.dto.GetPostListResponse;
 import com.jyp.miniboard.dto.PostDetailResponse;
+import com.jyp.miniboard.dto.PostSummary;
 import com.jyp.miniboard.dto.post.CreatePostRequest;
 import com.jyp.miniboard.dto.post.CreatePostResponse;
 import com.jyp.miniboard.exception.MemberErrorResult;
@@ -19,7 +20,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -236,17 +241,21 @@ public class PostServiceTest {
     @Nested
     class 게시글목록조회 {
         @Test
-        void 게시글목록조회성공() {
+        void 게시글목록조회성공_page와size기본값() {
             // given
-            doReturn(List.of(post(), post())).when(postRepository).findAll();
+            final List<Post> posts = Arrays.asList(post(), post(), post());
+            final Page<Post> postPage = new PageImpl<>(posts);
+            doReturn(postPage).when(postRepository).findAll(any(PageRequest.class));
+            final PageRequest pageRequest = PageRequest.of(0, 10);
 
             // when
-            GetPostListResponse result = postService.getPostList();
+            final Page<PostSummary> result = postService.getPostList(pageRequest);
 
             // then
             assertThat(result).isNotNull();
-            assertThat(result.posts().size()).isEqualTo(2);
-            assertThat(result.posts().get(0).title()).isEqualTo("title");
+            assertThat(result.getTotalElements()).isEqualTo(3);
+            assertThat(result.getTotalPages()).isEqualTo(1);
+            assertThat(result.getContent().get(0).title()).isEqualTo("title");
         }
     }
 

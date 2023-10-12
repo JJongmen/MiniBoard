@@ -2,8 +2,9 @@ package com.jyp.miniboard.controller;
 
 import com.google.gson.Gson;
 import com.jyp.miniboard.common.GlobalExceptionHandler;
+import com.jyp.miniboard.domain.Member;
+import com.jyp.miniboard.domain.Post;
 import com.jyp.miniboard.dto.EditPostRequest;
-import com.jyp.miniboard.dto.GetPostListResponse;
 import com.jyp.miniboard.dto.PostDetailResponse;
 import com.jyp.miniboard.dto.post.CreatePostRequest;
 import com.jyp.miniboard.exception.MemberErrorResult;
@@ -23,6 +24,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
@@ -31,10 +36,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -56,7 +63,9 @@ public class PostControllerTest {
         mockMvc = MockMvcBuilders
                 .standaloneSetup(postController)
                 .setControllerAdvice(new GlobalExceptionHandler())
-                .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
+                .setCustomArgumentResolvers(
+                        new AuthenticationPrincipalArgumentResolver(),
+                        new PageableHandlerMethodArgumentResolver())
                 .build();
     }
 
@@ -316,14 +325,18 @@ public class PostControllerTest {
         }
     }
 
+
     @Nested
     class 게시글목록조회 {
         @Test
         void 게시글목록조회성공() throws Exception {
             // given
             final String url = "/api/v1/posts";
-            doReturn(new GetPostListResponse(List.of(new GetPostListResponse.PostSummary(1L, "title", "writer"))))
-                    .when(postService).getPostList();
+            final Member member = Member.builder().name("name").build();
+            final Post post = Post.builder().id(1L).title("title").writer(member).build();
+            final List<Post> posts = Arrays.asList(post, post, post);
+            final Page<Post> postPage = new PageImpl<>(posts);
+            doReturn(postPage).when(postService).getPostList(any(Pageable.class));
 
             // when
             final ResultActions resultActions = mockMvc.perform(
@@ -332,9 +345,8 @@ public class PostControllerTest {
 
             // then
             resultActions.andExpect(status().isOk())
-                    .andExpect(jsonPath("$.posts").isArray())
-                    .andExpect(jsonPath("$.posts[0].id").value(1L))
-                    .andExpect(jsonPath("$.posts[0].title").value("title"));
+                    .andExpect(jsonPath("$.content[0].id").value(1L))
+                    .andExpect(jsonPath("$.pageable").isNotEmpty());
         }
     }
 }
