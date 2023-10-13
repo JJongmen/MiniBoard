@@ -8,7 +8,6 @@ import '@fontsource/roboto/700.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import Header from './layout/Header';
-import Footer from './layout/Footer';
 import { BrowserRouter } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -17,7 +16,6 @@ root.render(
   <BrowserRouter>
     <Header />
     <App />
-    <Footer />
   </BrowserRouter>
 );
 
