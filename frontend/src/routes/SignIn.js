@@ -3,25 +3,37 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-// import Link from '@mui/material/Link';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { signIn } from '../api/SignInApi';
 
 const defaultTheme = createTheme();
 
 export default function SignIn() {
-  const handleSubmit = (event) => {
+  let navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const email = event.currentTarget.email.value;
+    const password = event.currentTarget.password.value;
+
+    try {
+      // API 호출하여 로그인 시도
+      const response = await signIn(email, password);
+      
+      // 성공적인 응답에 따른 처리 (예: 토큰 저장, 리다이렉트 등)
+      console.log('Login successful:', response.data);
+      localStorage.setItem('access_token', response.data.token);
+      navigate('/');
+    } catch (error) {
+      // 로그인 실패 시 처리 (예: 에러 메시지 표시)
+      console.error('Login failed:', error);
+    }
   };
 
   return (
