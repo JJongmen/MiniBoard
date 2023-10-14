@@ -11,11 +11,14 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { signUp } from '../api/SignUpApi';
+import { useDispatch } from 'react-redux';
+import { showSnackbar } from '../redux/snackbarSlice';
 
 const defaultTheme = createTheme();
 
 export default function SignUp() {
   let navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -26,9 +29,11 @@ export default function SignUp() {
     try {
       const response = await signUp(name, email, password);
       console.log('Registration successful:', response);
+      dispatch(showSnackbar({ message: '회원가입에 성공했습니다!', severity: 'success' }));
       navigate('/sign-in');
     } catch (error) {
       console.error('Registration failed:', error);
+      dispatch(showSnackbar({ message: '회원가입에 실패했습니다.', severity: 'error' }));
     }
   };
 
