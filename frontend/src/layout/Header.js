@@ -14,11 +14,13 @@ export default function Header() {
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
+    localStorage.removeItem('user_name');
     navigate('/');
   };
   
   // 토큰의 존재 여부를 통해 로그인 상태 확인
   const isLoggedIn = !!localStorage.getItem('access_token');
+  const userName = localStorage.getItem('user_name'); 
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -41,6 +43,7 @@ export default function Header() {
           >
             게시판
           </Typography>
+          {userName && <Typography variant="h6">{userName}</Typography>}
           {
             isLoggedIn ? (
               // 로그인 상태일 때 로그아웃 버튼 표시

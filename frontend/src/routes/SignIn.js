@@ -29,6 +29,7 @@ export default function SignIn() {
       // 성공적인 응답에 따른 처리 (예: 토큰 저장, 리다이렉트 등)
       console.log('Login successful:', response.data);
       localStorage.setItem('access_token', response.data.token);
+      localStorage.setItem('user_name', response.data.name);
       navigate('/');
     } catch (error) {
       // 로그인 실패 시 처리 (예: 에러 메시지 표시)
