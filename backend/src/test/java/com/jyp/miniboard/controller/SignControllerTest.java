@@ -137,7 +137,9 @@ class SignControllerTest {
             return Stream.of(
                     Arguments.of(new SignInRequest(null, "password"), "email이 없음"),
                     Arguments.of(new SignInRequest("name@email.com", null), "password가 없음"),
-                    Arguments.of(new SignInRequest("wrong email form", "password"), "email 형식이 잘못됨")
+                    Arguments.of(new SignInRequest("wrong email form", "password"), "email 형식이 잘못됨"),
+                    Arguments.of(new SignInRequest("", "password"), "email이 빈 문자열임"),
+                    Arguments.of(new SignInRequest("name@email.com", ""), "password가 빈 문자열임")
             );
         }
 
