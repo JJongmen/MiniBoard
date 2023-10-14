@@ -8,6 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Pagination } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -59,7 +60,7 @@ export default function Board() {
             </TableHead>
             <TableBody>
               {rows.map((row) => (
-                <StyledTableRow key={row.id} sx={{ display: 'flex' }}>
+                <StyledTableRow component={Link} to={`/posts/${row.id}`} key={row.id} sx={{ display: 'flex' }}>
                   <StyledTableCell sx={{ flex: 1 }} component="th" scope="row">
                     {row.id}
                   </StyledTableCell>
