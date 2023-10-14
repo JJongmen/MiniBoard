@@ -6,9 +6,20 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 export default function Header() {
+
+  let navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    navigate('/');
+  };
+  
+  // 토큰의 존재 여부를 통해 로그인 상태 확인
+  const isLoggedIn = !!localStorage.getItem('access_token');
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -30,9 +41,19 @@ export default function Header() {
           >
             게시판
           </Typography>
-        <Button component={RouterLink} to="/sign-in" color="inherit">
-            로그인
-        </Button>
+          {
+            isLoggedIn ? (
+              // 로그인 상태일 때 로그아웃 버튼 표시
+              <Button color="inherit" onClick={handleLogout}>
+                로그아웃
+              </Button>
+            ) : (
+              // 로그아웃 상태일 때 로그인 버튼 표시
+              <Button component={RouterLink} to="/sign-in" color="inherit">
+                로그인
+              </Button>
+            )
+          }
         </Toolbar>
       </AppBar>
     </Box>
