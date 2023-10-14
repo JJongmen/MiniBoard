@@ -68,8 +68,11 @@ class SignControllerTest {
             return Stream.of(
                     Arguments.of(new SignUpRequest(null, "name@email.com", "password"), "name이 없음"),
                     Arguments.of(new SignUpRequest("name", null, "password"), "email이 없음"),
-                    Arguments.of(new SignUpRequest("name", "email", null), "password가 없음"),
-                    Arguments.of(new SignUpRequest("name", "wrong email form", "password"), "email 형식이 잘못됨")
+                    Arguments.of(new SignUpRequest("name", "name@email,com", null), "password가 없음"),
+                    Arguments.of(new SignUpRequest("name", "wrong email form", "password"), "email 형식이 잘못됨"),
+                    Arguments.of(new SignUpRequest("", "name@email.com", "password"), "name이 빈 문자열임"),
+                    Arguments.of(new SignUpRequest("name", "", "password"), "email이 빈 문자열임"),
+                    Arguments.of(new SignUpRequest("name", "name@email.com", ""), "password가 빈 문자열임")
             );
         }
 
