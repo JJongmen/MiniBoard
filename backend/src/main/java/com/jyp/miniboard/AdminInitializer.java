@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component
+//@Component
 public class AdminInitializer implements ApplicationRunner {
     private final MemberRepository memberRepository;
     private final PasswordEncoder encoder;
