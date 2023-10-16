@@ -43,6 +43,14 @@ jobs:
           cat src/main/resources/application.yml
         working-directory: backend
 
+      # Jwt Configuration
+      - name: Set up jwt.yml
+        run: |
+          touch src/main/resources/jwt.yml
+          echo "${{ secrets.JWT }}" > src/main/resources/jwt.yml
+          cat src/main/resources/jwt.yml
+        working-directory: backend
+
       # (3) Gradle build (Test 제외)
       - name: Run chmod to make gradlew executable
         run: chmod +x ./gradlew
