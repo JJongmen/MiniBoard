@@ -1,8 +1,8 @@
 package com.jyp.miniboard.controller;
 
-import com.jyp.miniboard.dto.EditPostRequest;
-import com.jyp.miniboard.dto.PostDetailResponse;
-import com.jyp.miniboard.dto.PostSummary;
+import com.jyp.miniboard.dto.post.EditPostRequest;
+import com.jyp.miniboard.dto.post.PostDetailResponse;
+import com.jyp.miniboard.dto.post.PostSummary;
 import com.jyp.miniboard.dto.post.CreatePostRequest;
 import com.jyp.miniboard.dto.post.CreatePostResponse;
 import com.jyp.miniboard.security.UserAuthorize;

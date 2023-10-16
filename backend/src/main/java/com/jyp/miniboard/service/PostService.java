@@ -2,10 +2,9 @@ package com.jyp.miniboard.service;
 
 import com.jyp.miniboard.domain.Member;
 import com.jyp.miniboard.domain.Post;
-import com.jyp.miniboard.dto.EditPostRequest;
-import com.jyp.miniboard.dto.GetPostListResponse;
-import com.jyp.miniboard.dto.PostDetailResponse;
-import com.jyp.miniboard.dto.PostSummary;
+import com.jyp.miniboard.dto.post.EditPostRequest;
+import com.jyp.miniboard.dto.post.PostDetailResponse;
+import com.jyp.miniboard.dto.post.PostSummary;
 import com.jyp.miniboard.dto.post.CreatePostRequest;
 import com.jyp.miniboard.dto.post.CreatePostResponse;
 import com.jyp.miniboard.exception.MemberErrorResult;
@@ -19,8 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service

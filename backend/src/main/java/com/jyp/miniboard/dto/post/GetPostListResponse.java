@@ -1,4 +1,4 @@
-package com.jyp.miniboard.dto;
+package com.jyp.miniboard.dto.post;
 
 import com.jyp.miniboard.domain.Post;
 
