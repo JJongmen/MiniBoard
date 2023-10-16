@@ -30,7 +30,7 @@ class HealthControllerTest {
     @Test
     void 서버헬스체크() throws Exception {
         // given
-        final String url = "/";
+        final String url = "/health";
 
         // when
         final ResultActions resultActions = mockMvc.perform(

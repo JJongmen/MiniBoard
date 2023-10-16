@@ -27,7 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final String[] allowedUrls = {"/", "/api/v1/sign-up", "/api/v1/sign-in"};
+    private final String[] allowedUrls = {"/", "/health", "/api/v1/sign-up", "/api/v1/sign-in"};
 
     @Bean
     public PasswordEncoder passwordEncoder() {
