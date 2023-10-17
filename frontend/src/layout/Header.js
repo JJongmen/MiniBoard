@@ -7,21 +7,17 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
 
 export default function Header() {
-
+  const { isLoggedIn, userName, logout } = useAuth();
   let navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('user_name');
+    logout();
     navigate('/');
   };
   
-  // 토큰의 존재 여부를 통해 로그인 상태 확인
-  const isLoggedIn = !!localStorage.getItem('access_token');
-  const userName = localStorage.getItem('user_name'); 
-
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">

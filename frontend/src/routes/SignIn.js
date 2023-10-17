@@ -13,12 +13,15 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { signIn } from '../api/SignInApi';
 import { useDispatch } from 'react-redux';
 import { showSnackbar } from '../redux/snackbarSlice';
+import { useAuth } from '../auth/AuthContext';
 
 const defaultTheme = createTheme();
 
 export default function SignIn() {
   let navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const { login } = useAuth();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -29,14 +32,13 @@ export default function SignIn() {
       // API 호출하여 로그인 시도
       const response = await signIn(email, password);
       
-      // 성공적인 응답에 따른 처리 (예: 토큰 저장, 리다이렉트 등)
+      // 성공적인 응답에 따른 처리
+      login(response.data.token, response.data.name);
       console.log('Login successful:', response.data);
-      localStorage.setItem('access_token', response.data.token);
-      localStorage.setItem('user_name', response.data.name);
       dispatch(showSnackbar({ message: '로그인에 성공했습니다!', severity: 'success' }));
       navigate('/');
     } catch (error) {
-      // 로그인 실패 시 처리 (예: 에러 메시지 표시)
+      // 로그인 실패 시 처리
       console.error('Login failed:', error);
       dispatch(showSnackbar({ message: '로그인에 실패했습니다.', severity: 'error' }));
     }

@@ -13,16 +13,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import GlobalSnackbar from './components/GlobalSnackbar'; 
 import { Provider } from 'react-redux'; 
 import store from './redux/store';
+import { AuthProvider } from './auth/AuthContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <Provider store={store}>
-    <BrowserRouter>
-      <Header />
-      <App />
-      <GlobalSnackbar />
-    </BrowserRouter>
-  </Provider>
+  <AuthProvider>
+    <Provider store={store}>
+      <BrowserRouter>
+        <Header />
+        <App />
+        <GlobalSnackbar />
+      </BrowserRouter>
+    </Provider>
+  </AuthProvider>
 );
 
 reportWebVitals();
