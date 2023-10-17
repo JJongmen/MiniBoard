@@ -34,32 +34,25 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function createData(id, title, name) {
-  return { id, title, name };
-}
-
-const rows = [
-  createData(5, '멍멍', '강아지'),
-  createData(4, '꿀꿀', '돼지'),
-  createData(3, '냐옹', '고양이'),
-  createData(2, '파아안다', '판다'),
-  createData(1, '쿼어어어카', '쿼카'),
-];
-
 export default function Board() {
   const [posts, setPosts] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getPosts();
+    const fetchData = async (page) => {
+      const data = await getPosts(page - 1);  // API의 페이지 인덱스는 0부터 시작하므로 -1을 한다.
       setPosts(data.content);
       setTotalPages(data.totalPages);
     };
 
-    fetchData();
-  }, []);
+    fetchData(currentPage);
+  }, [currentPage]);
   
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
     return (
       <div style={{ margin: '20px' }}>
         <TableContainer component={Paper}>
@@ -89,7 +82,12 @@ export default function Board() {
           </Table>
         </TableContainer>
         <div style={{ display: 'flex', alignItems: 'center', marginTop: '20px' }}>
-          <Pagination style={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }} count={10} color="primary" />
+          <Pagination style={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }} 
+            count={totalPages} 
+            page={currentPage}
+            color="primary" 
+            onChange={handlePageChange}
+          />
           <Button component={Link} to={`/posts/write`}
               variant="contained" 
               color="primary" 
