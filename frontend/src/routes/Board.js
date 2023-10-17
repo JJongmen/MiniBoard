@@ -13,6 +13,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button';
 import { useState, useEffect } from 'react';
 import { getPosts } from '../api/GetPostsApi';
+import { useAuth } from '../auth/AuthContext';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -38,6 +39,7 @@ export default function Board() {
   const [posts, setPosts] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
+  const { isLoggedIn } = useAuth()
 
   useEffect(() => {
     const fetchData = async (page) => {
@@ -88,7 +90,7 @@ export default function Board() {
             color="primary" 
             onChange={handlePageChange}
           />
-          <Button component={Link} to={`/posts/write`}
+          <Button component={Link} to={isLoggedIn ? `/posts/write` : `/sign-in`}
               variant="contained" 
               color="primary" 
               startIcon={<AddIcon />}
