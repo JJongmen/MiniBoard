@@ -1,17 +1,34 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Typography, Paper, Box } from '@mui/material';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { getPostDetail } from '../api/GetPostDetailApi';
 
 function Post() {
   let { postId } = useParams();
+  const [post, setPost] = useState({
+    title: '',
+    writerName: '',
+    content: ''
+  });
 
-  // postId를 사용하여 API 호출 및 데이터 로드
-  // 예시로 임시 데이터를 사용합니다.
-  const post = {
-    title: '샘플 게시글 제목',
-    author: '작성자 이름',
-    content: `여기에 게시글의 내용이 들어갑니다.`,
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const postDetail = await getPostDetail(postId);
+        setPost({
+          title: postDetail.title,
+          writerName: postDetail.writerName,
+          content: postDetail.content
+        });
+      } catch (error) {
+        console.error("게시글을 불러오는데 실패했습니다.", error);
+      }
+    };
+
+    fetchData();
+  }, [postId]);
 
   return (
     <Container maxWidth="md" style={{ marginTop: '40px' }}>
@@ -20,7 +37,7 @@ function Post() {
           {post.title}
         </Typography>
         <Typography variant="subtitle1" gutterBottom>
-          작성자: {post.author}
+          작성자: {post.writerName}
         </Typography>
         <Box mt={4}>
           <Typography variant="body1" paragraph>
