@@ -7,6 +7,7 @@ import SignUp from './routes/SignUp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Board from './routes/Board';
 import Post from './routes/Post';
+import PostWrite from './routes/PostWrite';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path="/sign-in" element={<SignIn/>} />
       <Route path="/sign-up" element={<SignUp/>} />
       <Route path="/posts/:postId" element={<Post/>} />
+      <Route path="/posts/write" element={<PostWrite/>} />
     </Routes>
   );
 }

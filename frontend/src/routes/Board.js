@@ -9,6 +9,8 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Pagination } from '@mui/material';
 import { Link } from 'react-router-dom';
+import AddIcon from '@mui/icons-material/Add';
+import Button from '@mui/material/Button';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -71,8 +73,15 @@ export default function Board() {
             </TableBody>
           </Table>
         </TableContainer>
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-            <Pagination count={10} color="primary" />
+        <div style={{ display: 'flex', alignItems: 'center', marginTop: '20px' }}>
+          <Pagination style={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }} count={10} color="primary" />
+          <Button component={Link} to={`/posts/write`}
+              variant="contained" 
+              color="primary" 
+              startIcon={<AddIcon />}
+          >
+              글 쓰기
+          </Button>
         </div>
       </div>
     );
