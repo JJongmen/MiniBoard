@@ -46,6 +46,7 @@ public class PostController {
     }
 
     @PutMapping("/api/v1/posts/{postId}")
+    @UserAuthorize
     public ResponseEntity<Void> editPost(
             @AuthenticationPrincipal User user,
             @PathVariable final Long postId,
@@ -55,7 +56,8 @@ public class PostController {
     }
 
     @DeleteMapping("/api/v1/posts/{postId}")
-    public ResponseEntity<Void> editPost(
+    @UserAuthorize
+    public ResponseEntity<Void> deletePost(
             @AuthenticationPrincipal User user,
             @PathVariable final Long postId) {
         postService.deletePost(getMemberId(user), postId);
