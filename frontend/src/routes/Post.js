@@ -1,11 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Typography, Paper, Box } from '@mui/material';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { Container, Typography, Paper, Box, Button } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { getPostDetail } from '../api/GetPostDetailApi';
+import { deletePost } from '../api/DeletePostApi';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { showSnackbar } from '../redux/snackbarSlice';
+import { Link } from 'react-router-dom';
 
 function Post() {
+  let navigate = useNavigate();
+  const dispatch = useDispatch();
+
   let { postId } = useParams();
   const [post, setPost] = useState({
     title: '',
@@ -30,6 +38,17 @@ function Post() {
     fetchData();
   }, [postId]);
 
+  const handleDelete = async () => {
+    try {
+      await deletePost(postId);
+      dispatch(showSnackbar({ message: '게시글이 삭제되었습니다.', severity: 'success' }));
+      navigate('/');
+    } catch (error) {
+      console.error("게시글 삭제에 실패했습니다.", error);
+      dispatch(showSnackbar({ message: '게시글 삭제에 실패했습니다.', severity: 'error' }));
+    }
+  };
+
   return (
     <Container maxWidth="md" style={{ marginTop: '40px' }}>
       <Paper elevation={3} style={{ padding: '20px' }}>
@@ -43,6 +62,24 @@ function Post() {
           <Typography variant="body1" paragraph>
             {post.content}
           </Typography>
+        </Box>
+        <Box mt={4} display="flex" justifyContent="flex-end">
+          <Button component={Link} to={`/posts/${postId}/edit`}
+            variant="contained" 
+            color="primary"
+            startIcon={<EditIcon />}
+            style={{ marginRight: '10px' }}
+          >
+            수정
+          </Button>
+          <Button 
+            variant="contained" 
+            color="secondary"
+            startIcon={<DeleteIcon />}
+            onClick={handleDelete}
+          >
+            삭제
+          </Button>
         </Box>
       </Paper>
     </Container>

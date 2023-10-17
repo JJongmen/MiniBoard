@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Board from './routes/Board';
 import Post from './routes/Post';
 import PostWrite from './routes/PostWrite';
+import PostEdit from './routes/PostEdit';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Route path="/sign-up" element={<SignUp/>} />
       <Route path="/posts/:postId" element={<Post/>} />
       <Route path="/posts/write" element={<PostWrite/>} />
+      <Route path="/posts/:postId/edit" element={<PostEdit/>} />
     </Routes>
   );
 }
