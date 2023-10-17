@@ -11,6 +11,8 @@ import { Pagination } from '@mui/material';
 import { Link } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button';
+import { useState, useEffect } from 'react';
+import { getPosts } from '../api/GetPostsApi';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -45,6 +47,19 @@ const rows = [
 ];
 
 export default function Board() {
+  const [posts, setPosts] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getPosts();
+      setPosts(data.content);
+      setTotalPages(data.totalPages);
+    };
+
+    fetchData();
+  }, []);
+  
     return (
       <div style={{ margin: '20px' }}>
         <TableContainer component={Paper}>
@@ -61,13 +76,13 @@ export default function Board() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
-                <StyledTableRow component={Link} to={`/posts/${row.id}`} key={row.id} sx={{ display: 'flex' }}>
+              {posts.map((post) => (
+                <StyledTableRow component={Link} to={`/posts/${post.id}`} key={post.id} sx={{ display: 'flex' }}>
                   <StyledTableCell sx={{ flex: 1 }} component="th" scope="row">
-                    {row.id}
+                    {post.id}
                   </StyledTableCell>
-                  <StyledTableCell sx={{ flex: 10 }} align="left">{row.title}</StyledTableCell>
-                  <StyledTableCell sx={{ flex: 3 }} align="left">{row.name}</StyledTableCell>
+                  <StyledTableCell sx={{ flex: 10 }} align="left">{post.title}</StyledTableCell>
+                  <StyledTableCell sx={{ flex: 3 }} align="left">{post.writerName}</StyledTableCell>
                 </StyledTableRow>
               ))}
             </TableBody>
