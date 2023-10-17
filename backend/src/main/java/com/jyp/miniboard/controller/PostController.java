@@ -66,14 +66,8 @@ public class PostController {
 
     @GetMapping("/api/v1/posts")
     public ResponseEntity<Page<PostSummary>> getPostList(
-            @PageableDefault(page = 1, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        int zeroBasedPageNumber = Math.max(0, pageable.getPageNumber() - 1);
-        final Pageable zeroBasedPageable = PageRequest.of(
-                zeroBasedPageNumber,
-                pageable.getPageSize(),
-                pageable.getSort()
-        );
-        final Page<PostSummary> response = postService.getPostList(zeroBasedPageable);
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        final Page<PostSummary> response = postService.getPostList(pageable);
         return ResponseEntity.ok(response);
     }
 }
