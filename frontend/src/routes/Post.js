@@ -45,7 +45,11 @@ function Post() {
       navigate('/');
     } catch (error) {
       console.error("게시글 삭제에 실패했습니다.", error);
-      dispatch(showSnackbar({ message: '게시글 삭제에 실패했습니다.', severity: 'error' }));
+      if (error.code === 'NOT_MATCH_MEMBER') {
+        dispatch(showSnackbar({ message: '자신이 작성하지 않은 글은 삭제할 수 없습니다.', severity: 'error' }));
+      } else {
+        dispatch(showSnackbar({ message: '게시글 삭제에 실패했습니다.', severity: 'error' }));
+      }
     }
   };
 
