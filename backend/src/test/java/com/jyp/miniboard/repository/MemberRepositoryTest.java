@@ -1,5 +1,6 @@
 package com.jyp.miniboard.repository;
 
+import com.jyp.miniboard.common.MemberType;
 import com.jyp.miniboard.domain.Member;
 import com.jyp.miniboard.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
@@ -27,11 +28,7 @@ public class MemberRepositoryTest {
     @Test
     void 멤버등록() {
         // given
-        final Member member = Member.builder()
-                .name(name)
-                .email(email)
-                .password(password)
-                .build();
+        final Member member = member();
 
         // when
         final Member result = memberRepository.save(member);
@@ -43,11 +40,20 @@ public class MemberRepositoryTest {
         assertThat(result.getPassword()).isEqualTo(password);
     }
 
+    private Member member() {
+        final Member member = Member.builder()
+                .name(name)
+                .email(email)
+                .password(password)
+                .type(MemberType.USER)
+                .build();
+        return member;
+    }
+
     @Test
     void 멤버존재여부() {
         // given
-        final Member member = Member.builder().email(email).build();
-        memberRepository.save(member);
+        memberRepository.save(member());
 
         // when
         boolean isExist = memberRepository.existsByEmail(email);
@@ -59,8 +65,7 @@ public class MemberRepositoryTest {
     @Test
     void 이메일가진멤버조회() {
         // given
-        final Member member = Member.builder().email(email).build();
-        memberRepository.save(member);
+        memberRepository.save(member());
 
         // when
         final Optional<Member> optionalMember = memberRepository.findByEmail(email);
