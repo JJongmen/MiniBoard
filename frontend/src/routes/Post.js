@@ -8,11 +8,12 @@ import { deletePost } from '../api/DeletePostApi';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { showSnackbar } from '../redux/snackbarSlice';
-import { Link } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
 
 function Post() {
   let navigate = useNavigate();
   const dispatch = useDispatch();
+  const { userName } = useAuth()
 
   let { postId } = useParams();
   const [post, setPost] = useState({
@@ -53,6 +54,14 @@ function Post() {
     }
   };
 
+  const handleEdit = () => {
+        if (post.writerName !== userName) {
+            dispatch(showSnackbar({ message: '자신이 작성하지 않은 글은 수정할 수 없습니다.', severity: 'error' }));
+            return;
+        }
+        navigate(`/posts/${postId}/edit`);
+  };
+
   return (
     <Container maxWidth="md" style={{ marginTop: '40px' }}>
       <Paper elevation={3} style={{ padding: '20px' }}>
@@ -68,10 +77,11 @@ function Post() {
           </Typography>
         </Box>
         <Box mt={4} display="flex" justifyContent="flex-end">
-          <Button component={Link} to={`/posts/${postId}/edit`}
+          <Button
             variant="contained" 
             color="primary"
             startIcon={<EditIcon />}
+            onClick={handleEdit}
             style={{ marginRight: '10px' }}
           >
             수정
