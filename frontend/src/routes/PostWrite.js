@@ -1,14 +1,27 @@
 import React, { useState } from 'react';
 import { Container, Typography, Paper, Box, TextField, Button } from '@mui/material';
+import { createPost } from '../api/CreatePostApi';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { showSnackbar } from '../redux/snackbarSlice';
 
 function PostWrite() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 
-  const handleWrite = () => {
-    // TODO: API나 서버로 데이터 전송 코드 작성
-    console.log('제목:', title);
-    console.log('내용:', content);
+  let navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleWrite = async () => {
+    try {
+      const response = await createPost(title, content);
+      console.log('게시글 작성 성공:', response);
+      dispatch(showSnackbar({ message: '성공적으로 게시되었습니다!', severity: 'success' }));
+      navigate(`/posts/${response.id}`);
+    } catch (error) {
+      console.error('게시글 작성 중 오류 발생:', error);
+      dispatch(showSnackbar({ message: '게시글 게시에 실패했습니다.', severity: 'error' }));
+    }
   };
 
   return (
