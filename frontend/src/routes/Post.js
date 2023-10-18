@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { showSnackbar } from '../redux/snackbarSlice';
 import { useAuth } from '../auth/AuthContext';
+import { formatDate } from '../utils/formatDateUtil';
 
 function Post() {
   let navigate = useNavigate();
@@ -19,22 +20,24 @@ function Post() {
   const [post, setPost] = useState({
     title: '',
     writerName: '',
-    content: ''
-  });
+    content: '',
+    createdAt: ''
+});
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const postDetail = await getPostDetail(postId);
-        setPost({
-          title: postDetail.title,
-          writerName: postDetail.writerName,
-          content: postDetail.content
-        });
+          const postDetail = await getPostDetail(postId);
+          setPost({
+            title: postDetail.title,
+            writerName: postDetail.writerName,
+            content: postDetail.content,
+            createdAt: postDetail.createdAt
+          });
       } catch (error) {
-        console.error("게시글을 불러오는데 실패했습니다.", error);
+          console.error("게시글을 불러오는데 실패했습니다.", error);
       }
-    };
+  };
 
     fetchData();
   }, [postId]);
@@ -69,6 +72,9 @@ function Post() {
           {post.title}
         </Typography>
         <Typography variant="subtitle1" gutterBottom>
+          작성일: {post.createdAt && formatDate(post.createdAt)}
+        </Typography>
+        <Typography variant="subtitle2" gutterBottom>
           작성자: {post.writerName}
         </Typography>
         <Box mt={4}>
