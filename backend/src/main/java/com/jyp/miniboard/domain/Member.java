@@ -1,5 +1,6 @@
 package com.jyp.miniboard.domain;
 
+import com.jyp.miniboard.common.BaseEntity;
 import com.jyp.miniboard.common.MemberType;
 import com.jyp.miniboard.dto.sign_up.SignUpRequest;
 import jakarta.persistence.*;
@@ -17,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "member")
 @Comment("회원")
-public class Member {
+public class Member extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")

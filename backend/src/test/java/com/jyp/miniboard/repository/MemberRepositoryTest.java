@@ -1,17 +1,20 @@
 package com.jyp.miniboard.repository;
 
+import com.jyp.miniboard.common.JpaAuditingConfig;
 import com.jyp.miniboard.common.MemberType;
 import com.jyp.miniboard.domain.Member;
-import com.jyp.miniboard.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest // JPA 관련된 설정만 로드
+@Import(JpaAuditingConfig.class) // JPA Auditing 설정 로드
 public class MemberRepositoryTest {
 
     @Autowired
@@ -29,6 +32,7 @@ public class MemberRepositoryTest {
     void 멤버등록() {
         // given
         final Member member = member();
+        LocalDateTime now = LocalDateTime.now();
 
         // when
         final Member result = memberRepository.save(member);
@@ -38,6 +42,8 @@ public class MemberRepositoryTest {
         assertThat(result.getName()).isEqualTo(name);
         assertThat(result.getEmail()).isEqualTo(email);
         assertThat(result.getPassword()).isEqualTo(password);
+        assertThat(result.getCreatedAt()).isAfter(now);
+        assertThat(result.getUpdatedAt()).isAfter(now);
     }
 
     private Member member() {
