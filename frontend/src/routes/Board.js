@@ -14,6 +14,7 @@ import Button from '@mui/material/Button';
 import { useState, useEffect } from 'react';
 import { getPosts } from '../api/GetPostsApi';
 import { useAuth } from '../auth/AuthContext';
+import { formatDate } from '../utils/formatDateUtil'; 
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -68,6 +69,9 @@ export default function Board() {
                 <StyledTableCell sx={{ flex: 3 }} align="left">
                   작성자
                 </StyledTableCell>
+                <StyledTableCell sx={{ flex: 3 }} align="left">
+                  작성일
+                </StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -78,6 +82,7 @@ export default function Board() {
                   </StyledTableCell>
                   <StyledTableCell sx={{ flex: 10 }} align="left">{post.title}</StyledTableCell>
                   <StyledTableCell sx={{ flex: 3 }} align="left">{post.writerName}</StyledTableCell>
+                  <StyledTableCell sx={{ flex: 3 }} align="left">{formatDate(post.createdAt)}</StyledTableCell>
                 </StyledTableRow>
               ))}
             </TableBody>
