@@ -7,6 +7,7 @@ import com.jyp.miniboard.domain.Post;
 import com.jyp.miniboard.dto.post.EditPostRequest;
 import com.jyp.miniboard.dto.post.PostDetailResponse;
 import com.jyp.miniboard.dto.post.CreatePostRequest;
+import com.jyp.miniboard.dto.post.PostSummary;
 import com.jyp.miniboard.exception.MemberErrorResult;
 import com.jyp.miniboard.exception.MemberException;
 import com.jyp.miniboard.exception.PostErrorResult;
@@ -36,14 +37,17 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.jayway.jsonpath.internal.JsonFormatter.prettyPrint;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -162,7 +166,8 @@ public class PostControllerTest {
         void 게시글조회성공() throws Exception {
             // given
             final String url = "/api/v1/posts/{postId}";
-            doReturn(new PostDetailResponse("title", "content", "name")).when(postService).getPostDetail(1L);
+            final LocalDateTime createdAt = LocalDateTime.of(2023, 10, 1, 0, 0, 0);
+            doReturn(new PostDetailResponse("title", "content", "name", createdAt)).when(postService).getPostDetail(1L);
 
             // when
             final ResultActions resultActions = mockMvc.perform(
@@ -173,7 +178,8 @@ public class PostControllerTest {
             resultActions.andExpect(status().isOk())
                     .andExpect(jsonPath("$.title").value("title"))
                     .andExpect(jsonPath("$.content").value("content"))
-                    .andExpect(jsonPath("$.writerName").value("name"));
+                    .andExpect(jsonPath("$.writerName").value("name"))
+                    .andExpect(jsonPath("$.createdAt").value("2023-10-01T00:00:00"));
         }
     }
 
@@ -333,9 +339,12 @@ public class PostControllerTest {
             // given
             final String url = "/api/v1/posts";
             final Member member = Member.builder().name("name").build();
-            final Post post = Post.builder().id(1L).title("title").writer(member).build();
-            final List<Post> posts = Arrays.asList(post, post, post);
-            final Page<Post> postPage = new PageImpl<>(posts);
+            final LocalDateTime createdAt = LocalDateTime.of(2023, 10, 1, 0, 0, 0);
+            final Post post = Post.builder().id(1L).title("title").writer(member).createdAt(createdAt).build();
+            final List<PostSummary> posts = Stream.of(post, post, post)
+                    .map(PostSummary::from)
+                    .toList();
+            final Page<PostSummary> postPage = new PageImpl<>(posts);
             doReturn(postPage).when(postService).getPostList(any(Pageable.class));
 
             // when
@@ -345,7 +354,9 @@ public class PostControllerTest {
 
             // then
             resultActions.andExpect(status().isOk())
+                    .andDo(print())
                     .andExpect(jsonPath("$.content[0].id").value(1L))
+                    .andExpect(jsonPath("$.content[0].createdAt").value("2023-10-01T00:00:00"))
                     .andExpect(jsonPath("$.pageable").isNotEmpty());
         }
     }

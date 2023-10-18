@@ -32,7 +32,7 @@ public class MemberRepositoryTest {
     void 멤버등록() {
         // given
         final Member member = member();
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.of(2023, 10, 1, 0, 0);
 
         // when
         final Member result = memberRepository.save(member);
